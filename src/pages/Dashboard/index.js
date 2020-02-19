@@ -7,15 +7,14 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
+import ChangeHistoryIcon from '@material-ui/icons/ChangeHistory';
+import AppsIcon from '@material-ui/icons/Apps';
 
 const drawerWidth = 240;
 
@@ -32,6 +31,8 @@ const useStyles = makeStyles(theme => ({
   },
   drawerPaper: {
     width: drawerWidth,
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.secondary.main,
   },
   content: {
     flexGrow: 1,
@@ -64,25 +65,18 @@ export default function Dashboard() {
       >
         <div className={classes.toolbar} />
         <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
-        <Divider />
-        <List>
-          {['All mail', 'Trash', 'Spam'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
+          <ListItem button>
+            <ListItemIcon>
+              <AppsIcon />
+            </ListItemIcon>
+            <ListItemText primary={'General'} />
+          </ListItem>
+          <ListItem button>
+            <ListItemIcon>
+              <ChangeHistoryIcon />
+            </ListItemIcon>
+            <ListItemText primary={'Devices'} />
+          </ListItem>
         </List>
       </Drawer>
       <main className={classes.content}>
