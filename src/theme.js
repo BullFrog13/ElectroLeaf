@@ -5,11 +5,11 @@ const theme = createMuiTheme({
   palette: {
     primary: {
       main: '#333333',
-      light: '#424242',
+      contrastText: '#fff',
     },
     secondary: {
-      main: '#fff',
-      contrastText: '#f48fb1',
+      main: '#f48fb1',
+      contrastText: '#424242',
     },
     error: {
       main: red.A400,

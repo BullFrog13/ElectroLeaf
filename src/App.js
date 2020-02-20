@@ -2,8 +2,8 @@ import React from 'react';
 import { Route, Switch, BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider } from '@material-ui/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import Dashboard from './pages/Dashboard';
-// import DeviceDetector from './pages/DeviceDetector';
+import Dashboard from './components/Dashboard';
+import DeviceDetector from './components/DeviceDetector';
 import theme from './theme';
 
 export default () => {
@@ -20,6 +20,11 @@ export default () => {
         <Route
           exact
           path="/"
+          component={() => componentThemeWrapper(DeviceDetector)}
+        />
+        <Route
+          exact
+          path="/dashboard"
           component={() => componentThemeWrapper(Dashboard)}
         />
         <Route render={() => <h1>Page not found</h1>} />

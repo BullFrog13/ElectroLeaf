@@ -32,7 +32,7 @@ const useStyles = makeStyles(theme => ({
   drawerPaper: {
     width: drawerWidth,
     backgroundColor: theme.palette.primary.main,
-    color: theme.palette.secondary.main,
+    color: theme.palette.primary.contrastText,
   },
   content: {
     flexGrow: 1,
@@ -52,7 +52,7 @@ export default function Dashboard() {
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <Typography variant="h6" noWrap>
-            Clipped drawer
+            Electro Leaf
           </Typography>
         </Toolbar>
       </AppBar>
@@ -67,13 +67,13 @@ export default function Dashboard() {
         <List>
           <ListItem button>
             <ListItemIcon>
-              <AppsIcon />
+              <AppsIcon color="secondary" />
             </ListItemIcon>
             <ListItemText primary={'General'} />
           </ListItem>
           <ListItem button>
             <ListItemIcon>
-              <ChangeHistoryIcon />
+              <ChangeHistoryIcon color="secondary" />
             </ListItemIcon>
             <ListItemText primary={'Devices'} />
           </ListItem>
