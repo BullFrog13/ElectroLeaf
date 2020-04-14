@@ -18,7 +18,7 @@ import { useHistory } from 'react-router-dom';
 import AppsIcon from '@material-ui/icons/Apps';
 import Switch from '@material-ui/core/Switch';
 import Slider from '@material-ui/core/Slider';
-import ColorPicker from 'material-ui-color-picker'
+import ColorPicker from 'material-ui-color-picker';
 
 const drawerWidth = 240;
 
@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
   toolbar: theme.mixins.toolbar,
 }));
 
-export default function Dashboard(props) {
+export default function Dashboard() {
   const classes = useStyles();
   const history = useHistory();
 
@@ -59,7 +59,7 @@ export default function Dashboard(props) {
   const [state, setState] = React.useState({
     checkedA: true,
     checkedB: true,
-    value: 30
+    value: 30,
   });
 
   const [value, setValue] = React.useState(30);
@@ -110,7 +110,13 @@ export default function Dashboard(props) {
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
-            <Grid style={{ backgroundColor: 'green' }} item xs={12} md={8} lg={9}>
+            <Grid
+              style={{ backgroundColor: 'green' }}
+              item
+              xs={12}
+              md={8}
+              lg={9}
+            >
               <div>
                 <Switch
                   checked={state.checkedA}
@@ -122,13 +128,18 @@ export default function Dashboard(props) {
             </Grid>
             <Grid style={{ backgroundColor: 'red' }} item xs={12} md={4} lg={3}>
               <ColorPicker
-                name='color'
-                defaultValue='#000'
+                name="color"
+                defaultValue="#000"
                 // value={this.state.color} - for controlled component
-                onChange={color => console.log(color)} />
+                onChange={(color) => console.log(color)}
+              />
             </Grid>
             <Grid style={{ backgroundColor: 'blue' }} item xs={12}>
-              <Slider value={value} onChange={handleSliderChange} aria-labelledby="continuous-slider" />
+              <Slider
+                value={value}
+                onChange={handleSliderChange}
+                aria-labelledby="continuous-slider"
+              />
             </Grid>
           </Grid>
         </Container>
