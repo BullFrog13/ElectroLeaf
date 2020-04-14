@@ -15,6 +15,9 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ChangeHistoryIcon from '@material-ui/icons/ChangeHistory';
 import AppsIcon from '@material-ui/icons/Apps';
+import Switch from '@material-ui/core/Switch';
+import Slider from '@material-ui/core/Slider';
+import ColorPicker from 'material-ui-color-picker'
 
 const drawerWidth = 240;
 
@@ -25,6 +28,7 @@ const useStyles = makeStyles(theme => ({
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
   },
+  appBarSpacer: theme.mixins.toolbar,
   drawer: {
     width: drawerWidth,
     flexShrink: 0,
@@ -46,13 +50,29 @@ export default function Dashboard() {
 
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
+  const [state, setState] = React.useState({
+    checkedA: true,
+    checkedB: true,
+    value: 30
+  });
+
+  const [value, setValue] = React.useState(30);
+
+  const handleChange = (event) => {
+    setState({ ...state, [event.target.name]: event.target.checked });
+  };
+
+  const handleSliderChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
   return (
     <div className={classes.root}>
       <CssBaseline />
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <Typography variant="h6" noWrap>
-            Electro Leaf
+            ElectroLeaf
           </Typography>
         </Toolbar>
       </AppBar>
@@ -83,17 +103,25 @@ export default function Dashboard() {
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
-            {/* Chart */}
-            <Grid item xs={12} md={8} lg={9}>
-              <Paper className={fixedHeightPaper} />
+            <Grid style={{ backgroundColor: 'green' }} item xs={12} md={8} lg={9}>
+              <div>
+                <Switch
+                  checked={state.checkedA}
+                  onChange={handleChange}
+                  name="checkedA"
+                  inputProps={{ 'aria-label': 'secondary checkbox' }}
+                />
+              </div>
             </Grid>
-            {/* Recent Deposits */}
-            <Grid item xs={12} md={4} lg={3}>
-              <Paper className={fixedHeightPaper} />
+            <Grid style={{ backgroundColor: 'red' }} item xs={12} md={4} lg={3}>
+              <ColorPicker
+                name='color'
+                defaultValue='#000'
+                // value={this.state.color} - for controlled component
+                onChange={color => console.log(color)} />
             </Grid>
-            {/* Recent Orders */}
-            <Grid item xs={12}>
-              <Paper className={classes.paper} />
+            <Grid style={{ backgroundColor: 'blue' }} item xs={12}>
+              <Slider value={value} onChange={handleSliderChange} aria-labelledby="continuous-slider" />
             </Grid>
           </Grid>
         </Container>
