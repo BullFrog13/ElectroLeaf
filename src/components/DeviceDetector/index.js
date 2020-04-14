@@ -9,6 +9,8 @@ import TextField from '@material-ui/core/TextField';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import { useHistory } from 'react-router-dom';
+import { useState } from 'react';
+import { NanoleafClient } from 'nanoleaf-client';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -41,12 +43,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignIn() {
+export default function DeviceDetector() {
   const classes = useStyles();
   const history = useHistory();
+  const [host, setHost] = useState('');
 
   const goToDashboard = () => {
-    history.push('/dashboard');
+    history.push({
+      pathname: '/dashboard',
+      state: { host },
+    });
   };
 
   const submitIp = () => {
@@ -71,6 +77,8 @@ export default function SignIn() {
           className={classes.ipTextField}
           InputLabelProps={{ className: classes.grayText }}
           InputProps={{ className: classes.whiteText }}
+          value={host}
+          onChange={(e) => setHost(e.target.value)}
         />
         <Button
           type="submit"
@@ -79,6 +87,7 @@ export default function SignIn() {
           color="primary"
           className={classes.submit}
           onClick={submitIp}
+          disabled={!host}
         >
           Continue
         </Button>
