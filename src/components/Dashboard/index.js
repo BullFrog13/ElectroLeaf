@@ -14,6 +14,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ChangeHistoryIcon from '@material-ui/icons/ChangeHistory';
+import { useHistory } from 'react-router-dom';
 import AppsIcon from '@material-ui/icons/Apps';
 import Switch from '@material-ui/core/Switch';
 import Slider from '@material-ui/core/Slider';
@@ -21,7 +22,7 @@ import ColorPicker from 'material-ui-color-picker'
 
 const drawerWidth = 240;
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
   },
@@ -45,8 +46,13 @@ const useStyles = makeStyles(theme => ({
   toolbar: theme.mixins.toolbar,
 }));
 
-export default function Dashboard() {
+export default function Dashboard(props) {
   const classes = useStyles();
+  const history = useHistory();
+
+  if (!history.location.state) history.push('');
+
+  console.log(history.location.state.host);
 
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
@@ -84,6 +90,7 @@ export default function Dashboard() {
         }}
       >
         <div className={classes.toolbar} />
+
         <List>
           <ListItem button>
             <ListItemIcon>
