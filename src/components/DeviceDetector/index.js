@@ -8,6 +8,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -42,6 +43,15 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignIn() {
   const classes = useStyles();
+  const history = useHistory();
+
+  const goToDashboard = () => {
+    history.push('/dashboard');
+  };
+
+  const submitIp = () => {
+    goToDashboard();
+  };
 
   return (
     <Container component="main" maxWidth="xs" className={classes.container}>
@@ -68,6 +78,7 @@ export default function SignIn() {
           variant="contained"
           color="primary"
           className={classes.submit}
+          onClick={submitIp}
         >
           Continue
         </Button>
