@@ -61,7 +61,6 @@ export default function DeviceDetector() {
 
   return (
     <Container component="main" maxWidth="xs" className={classes.container}>
-      <CssBaseline />
       <Grid container justify="center" className={classes.grid}>
         <Avatar className={classes.avatar}>
           <DetailsOutlinedIcon />

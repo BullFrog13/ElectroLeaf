@@ -59,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Dashboard(props) {
+export default function Dashboard() {
   const classes = useStyles();
   const history = useHistory();
 
@@ -164,7 +164,11 @@ export default function Dashboard(props) {
               </Card>
             </Grid>
             <Grid style={{ backgroundColor: 'blue' }} item xs={12}>
-              <Slider value={value} onChange={handleSliderChange} aria-labelledby="continuous-slider" />
+              <Slider
+                value={value}
+                onChange={handleSliderChange}
+                aria-labelledby="continuous-slider"
+              />
             </Grid>
           </Grid>
         </Container>
