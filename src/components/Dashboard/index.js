@@ -1,5 +1,4 @@
 import React from 'react';
-import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
@@ -25,7 +24,10 @@ import CardMedia from '@material-ui/core/CardMedia';
 import NanoleafImage from '../../assets/images/img.jpg';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import { red } from '@material-ui/core/colors';
+import Box from '@material-ui/core/Box';
+import PropTypes from 'prop-types';
+import CardActions from '@material-ui/core/CardActions';
+import { CardHeader, Divider } from '@material-ui/core';
 
 const drawerWidth = 240;
 
@@ -51,13 +53,43 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(3),
   },
   media: {
-    height: 180,
+    height: 240,
   },
-  toolbar: theme.mixins.toolbar,
-  avatar: {
-    backgroundColor: red[500],
+  colorCard: {
+    height: 240,
   },
+  toolbar: theme.mixins.toolbar
 }));
+
+function TabPanel(props) {
+  const { children, tabValue, index, ...other } = props;
+
+  return (
+    <Typography
+      component="div"
+      role="tabpanel"
+      hidden={tabValue !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {tabValue === index && <Box p={3}>{children}</Box>}
+    </Typography>
+  );
+}
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.any.isRequired,
+  tabValue: PropTypes.any.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
 
 export default function Dashboard() {
   const classes = useStyles();
@@ -65,19 +97,23 @@ export default function Dashboard() {
 
   if (!history.location.state) history.push('');
 
-  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
-
   const [state, setState] = React.useState({
     checkedA: true,
     checkedB: true,
     value: 30,
+    tabValue: 0
   });
 
   const [value, setValue] = React.useState(30);
+  const [tabValue, setTabValue] = React.useState(0);
 
   const handleChange = (event) => {
     setState({ ...state, [event.target.name]: event.target.checked });
   };
+
+  const handleTabsChange = (event, newValue) => {
+    setTabValue(newValue);
+  }
 
   const handleSliderChange = (event, newValue) => {
     setValue(newValue);
@@ -121,7 +157,7 @@ export default function Dashboard() {
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
-            <Grid style={{ backgroundColor: 'green' }} item xs={12} md={6} lg={6}>
+            <Grid item xs={12} md={6} lg={6}>
               {/* <div>
                 <Switch
                   checked={state.checkedA}
@@ -142,33 +178,96 @@ export default function Dashboard() {
               </Card>
             </Grid>
 
-            <Grid style={{ backgroundColor: 'red' }} item xs={12} md={6} lg={6}>
+            <Grid item xs={12} md={6} lg={6}>
               {/* <ColorPicker
                 name='color'
                 defaultValue='#000'
                 // value={this.state.color} - for controlled component
                 onChange={color => console.log(color)} /> */}
 
-              <Card className>
-                <CardMedia
-                  className={classes.media}
-                  image="/static/images/cards/paella.jpg"
-                  title="Paella dish"
-                />
-                <CardContent>
-                  <Typography variant="body2" color="textSecondary" component="p">
+              <Card>
+                <Tabs value={tabValue} onChange={handleTabsChange} aria-label="simple tabs example" centered>
+                  <Tab label="RGB" {...a11yProps(0)} />
+                  <Tab label="Hex" {...a11yProps(1)} />
+                  <Tab label="HSL" {...a11yProps(2)} />
+                </Tabs>
+
+                <CardContent className={classes.colorCard}>
+                  <TabPanel tabValue={tabValue} index={0}>
+                    Item One
+                  </TabPanel>
+                  <TabPanel tabValue={tabValue} index={1}>
+                    Item Two
+                  </TabPanel>
+                  <TabPanel tabValue={tabValue} index={2}>
+                    Item Three
+                  </TabPanel>
+                  {/* <Typography variant="body2" color="textSecondary" component="p">
                     This impressive paella is a perfect party dish and a fun meal to cook together with your
                     guests. Add 1 cup of frozen peas along with the mussels, if you like.
-        </Typography>
+                  </Typography> */}
                 </CardContent>
               </Card>
             </Grid>
-            <Grid style={{ backgroundColor: 'blue' }} item xs={12}>
-              <Slider
-                value={value}
-                onChange={handleSliderChange}
-                aria-labelledby="continuous-slider"
-              />
+          </Grid>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={3} lg={3}>
+              <Card>
+                <CardHeader title="Brightness">
+                </CardHeader>
+                <CardContent>
+                  <Slider
+                    value={value}
+                    onChange={handleSliderChange}
+                    aria-labelledby="continuous-slider"
+                  />
+                  <Typography className={classes.title} color="textSecondary" gutterBottom>
+                    Word of the Day
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={3} lg={3}>
+              <Card>
+                <CardHeader title="Color Temperature">
+                </CardHeader>
+                <CardContent>
+                  <Slider
+                    value={value}
+                    onChange={handleSliderChange}
+                    aria-labelledby="continuous-slider"
+                  />
+                  {/* <Typography className={classes.title} color="textSecondary" gutterBottom>
+                    Word of the Day
+                  </Typography> */}
+                </CardContent>
+                <Divider />
+                <CardActions>
+                  45
+                </CardActions>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={3} lg={3}>
+              <Card>
+                <CardHeader title="Theme">
+                </CardHeader>
+                <CardContent>
+                  <Typography className={classes.title} color="textSecondary" gutterBottom>
+                    Word of the Day
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={3} lg={3}>
+              <Card>
+                <CardHeader title="Status">
+                </CardHeader>
+                <CardContent>
+                  <Typography className={classes.title} color="textSecondary" gutterBottom>
+                    Word of the Day
+                  </Typography>
+                </CardContent>
+              </Card>
             </Grid>
           </Grid>
         </Container>
