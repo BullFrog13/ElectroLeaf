@@ -28,6 +28,7 @@ import Box from '@material-ui/core/Box';
 import PropTypes from 'prop-types';
 import CardActions from '@material-ui/core/CardActions';
 import { CardHeader, Divider } from '@material-ui/core';
+import { ChromePicker } from 'react-color'
 
 const drawerWidth = 240;
 
@@ -56,9 +57,13 @@ const useStyles = makeStyles((theme) => ({
     height: 240,
   },
   colorCard: {
-    height: 240,
+    height: 300,
   },
-  toolbar: theme.mixins.toolbar
+  toolbar: theme.mixins.toolbar,
+  alignCenter: {
+    alignItems: 'center',
+    display: 'inline'
+  }
 }));
 
 function TabPanel(props) {
@@ -101,11 +106,14 @@ export default function Dashboard() {
     checkedA: true,
     checkedB: true,
     value: 30,
+    ctValue: 1200,
     tabValue: 0
   });
 
   const [value, setValue] = React.useState(30);
+  const [ctValue, setCtValue] = React.useState(1200);
   const [tabValue, setTabValue] = React.useState(0);
+  const [colorValue, setColorValue] = React.useState('#ff0000');
 
   const handleChange = (event) => {
     setState({ ...state, [event.target.name]: event.target.checked });
@@ -115,9 +123,18 @@ export default function Dashboard() {
     setTabValue(newValue);
   }
 
-  const handleSliderChange = (event, newValue) => {
+  const handleBrightnessSliderChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  const handleCtSliderChange = (event, newValue) => {
+    setCtValue(newValue);
+  };
+
+  const handleColorChange = (color, event) => {
+    setColorValue(color);
+  };
+
 
   return (
     <div className={classes.root}>
@@ -179,12 +196,6 @@ export default function Dashboard() {
             </Grid>
 
             <Grid item xs={12} md={6} lg={6}>
-              {/* <ColorPicker
-                name='color'
-                defaultValue='#000'
-                // value={this.state.color} - for controlled component
-                onChange={color => console.log(color)} /> */}
-
               <Card>
                 <Tabs value={tabValue} onChange={handleTabsChange} aria-label="simple tabs example" centered>
                   <Tab label="RGB" {...a11yProps(0)} />
@@ -194,7 +205,12 @@ export default function Dashboard() {
 
                 <CardContent className={classes.colorCard}>
                   <TabPanel tabValue={tabValue} index={0}>
-                    Item One
+                    {/* <ColorPicker
+                      name='color'
+                      defaultValue='#000'
+                      // value={this.state.color} - for controlled component
+                      onChange={color => console.log(color)} /> */}
+                    <ChromePicker disableAlpha={true} onChange={handleColorChange} color={colorValue} />
                   </TabPanel>
                   <TabPanel tabValue={tabValue} index={1}>
                     Item Two
@@ -202,10 +218,6 @@ export default function Dashboard() {
                   <TabPanel tabValue={tabValue} index={2}>
                     Item Three
                   </TabPanel>
-                  {/* <Typography variant="body2" color="textSecondary" component="p">
-                    This impressive paella is a perfect party dish and a fun meal to cook together with your
-                    guests. Add 1 cup of frozen peas along with the mussels, if you like.
-                  </Typography> */}
                 </CardContent>
               </Card>
             </Grid>
@@ -213,60 +225,78 @@ export default function Dashboard() {
           <Grid container spacing={3}>
             <Grid item xs={12} md={3} lg={3}>
               <Card>
-                <CardHeader title="Brightness">
+                <CardHeader title="Brightness" titleTypographyProps={{ variant: 'h6' }}>
                 </CardHeader>
                 <CardContent>
                   <Slider
                     value={value}
-                    onChange={handleSliderChange}
+                    onChange={handleBrightnessSliderChange}
                     aria-labelledby="continuous-slider"
+                    marks={[{ value: 0, label: '0' }, { value: 100, label: '100' }]}
                   />
-                  <Typography className={classes.title} color="textSecondary" gutterBottom>
-                    Word of the Day
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} md={3} lg={3}>
-              <Card>
-                <CardHeader title="Color Temperature">
-                </CardHeader>
-                <CardContent>
-                  <Slider
-                    value={value}
-                    onChange={handleSliderChange}
-                    aria-labelledby="continuous-slider"
-                  />
-                  {/* <Typography className={classes.title} color="textSecondary" gutterBottom>
-                    Word of the Day
-                  </Typography> */}
                 </CardContent>
                 <Divider />
-                <CardActions>
-                  45
+                <CardActions className={classes.alignCenter}>
+                  <Typography align="center" variant="h6" color="textSecondary">
+                    {value}
+                  </Typography>
                 </CardActions>
               </Card>
             </Grid>
             <Grid item xs={12} md={3} lg={3}>
               <Card>
-                <CardHeader title="Theme">
+                <CardHeader title="Color Temperature" titleTypographyProps={{ variant: 'h6' }}>
                 </CardHeader>
                 <CardContent>
-                  <Typography className={classes.title} color="textSecondary" gutterBottom>
-                    Word of the Day
-                  </Typography>
+                  <Slider
+                    value={ctValue}
+                    onChange={handleCtSliderChange}
+                    aria-labelledby="continuous-slider"
+                    min={1200}
+                    max={6500}
+                    marks={[{ value: 1200, label: '1200' }, { value: 6500, label: '6500' }]}
+                  />
                 </CardContent>
+                <Divider />
+                <CardActions className={classes.alignCenter}>
+                  <Typography align="center" variant="h6" color="textSecondary">
+                    {ctValue}
+                  </Typography>
+                </CardActions>
               </Card>
             </Grid>
             <Grid item xs={12} md={3} lg={3}>
               <Card>
-                <CardHeader title="Status">
+                <CardHeader title="Theme" titleTypographyProps={{ variant: 'h6' }}>
                 </CardHeader>
                 <CardContent>
                   <Typography className={classes.title} color="textSecondary" gutterBottom>
                     Word of the Day
                   </Typography>
                 </CardContent>
+                <Divider />
+                <CardActions className={classes.alignCenter}>
+                  <Typography align="center" variant="h6" color="textSecondary">
+                    Pink
+                  </Typography>
+                </CardActions>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={3} lg={3}>
+              <Card>
+                <CardHeader title="Status" titleTypographyProps={{ variant: 'h6' }}>
+                </CardHeader>
+                <CardContent>
+                  <Typography className={classes.title} color="textSecondary" gutterBottom>
+                    Word of the Day
+                  </Typography>
+                </CardContent>
+                <Divider />
+                <CardActions className={classes.alignCenter}>
+                  <Typography align="center" variant="h6" color="textSecondary">
+                    OK
+                  </Typography>
+                </CardActions>
               </Card>
             </Grid>
           </Grid>
