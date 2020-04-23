@@ -118,7 +118,7 @@ export default function DeviceDetector() {
           InputProps={{ className: classes.whiteText }}
           value={state.host}
           onChange={(e) => {
-            setState((prevState) => ({ ...prevState, host: e.target.value }));
+            setState({ ...state, host: e.target.value });
           }}
         />
         <Button
