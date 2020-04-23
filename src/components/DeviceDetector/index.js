@@ -1,7 +1,9 @@
 import React from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
+import Modal from '@material-ui/core/Modal';
+import Backdrop from '@material-ui/core/Backdrop';
+import Fade from '@material-ui/core/Fade';
 import DetailsOutlinedIcon from '@material-ui/icons/DetailsOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
@@ -41,21 +43,59 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(2),
     width: '100%',
   },
+  modal: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  paper: {
+    backgroundColor: theme.palette.background.default,
+    border: '2px solid #000',
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
+    color: theme.palette.primary.contrastText,
+  },
+  displayCenter: {
+    textAlign: 'center',
+  },
 }));
 
 export default function DeviceDetector() {
   const classes = useStyles();
   const history = useHistory();
-  const [host, setHost] = useState('');
+  const [state, setState] = useState({ open: false, host: '' });
 
   const goToDashboard = () => {
+    // history.push({
+    //   pathname: '/dashboard',
+    //   // state: { state.host },
+    // });
     history.push({
       pathname: '/dashboard',
-      state: { host },
+      state: state.host,
     });
   };
 
+  const toggleModal = () => {
+    setState((prevState) => ({
+      ...prevState,
+      open: !prevState.open,
+    }));
+  };
+
   const submitIp = () => {
+    toggleModal();
+  };
+
+  const authorize = async () => {
+    const nanoleafClient = new NanoleafClient(state.host);
+    // await nanoleafClient.authorize();
+
+    try {
+    } catch (e) {}
+
+    console.log(nanoleafClient);
+
     goToDashboard();
   };
 
@@ -76,8 +116,10 @@ export default function DeviceDetector() {
           className={classes.ipTextField}
           InputLabelProps={{ className: classes.grayText }}
           InputProps={{ className: classes.whiteText }}
-          value={host}
-          onChange={(e) => setHost(e.target.value)}
+          value={state.host}
+          onChange={(e) => {
+            setState((prevState) => ({ ...prevState, host: e.target.value }));
+          }}
         />
         <Button
           type="submit"
@@ -86,11 +128,46 @@ export default function DeviceDetector() {
           color="primary"
           className={classes.submit}
           onClick={submitIp}
-          disabled={!host}
+          disabled={!state.host}
         >
           Continue
         </Button>
       </Grid>
+      <Modal
+        aria-labelledby="transition-modal-title"
+        aria-describedby="transition-modal-description"
+        className={classes.modal}
+        open={state.open}
+        onClose={toggleModal}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}
+      >
+        <Fade in={state.open}>
+          <div className={classes.paper}>
+            <h2 id="transition-modal-title" className={classes.displayCenter}>
+              Authorization
+            </h2>
+            <p id="transition-modal-description">
+              Hold on-off button down for 5-7 seconds until the LED starts
+              flashing and click the button.
+            </p>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+              onClick={authorize}
+              disabled={!state.host}
+            >
+              Authorize
+            </Button>
+          </div>
+        </Fade>
+      </Modal>
     </Container>
   );
 }
