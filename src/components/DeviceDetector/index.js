@@ -13,6 +13,7 @@ import Grid from '@material-ui/core/Grid';
 import { useHistory } from 'react-router-dom';
 import { useState } from 'react';
 import { NanoleafClient } from 'nanoleaf-client';
+import Axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -87,16 +88,16 @@ export default function DeviceDetector() {
     toggleModal();
   };
 
-  const authorize = async () => {
+  const authorize = () => {
     const nanoleafClient = new NanoleafClient(state.host);
+
+    Axios.get('http://localhost:3001/discover').then(res => {
+      let test = new URL(res.data[0].location);
+      const nanoleafClient = new NanoleafClient(state.host);
+      goToDashboard();
+    });
+
     // await nanoleafClient.authorize();
-
-    try {
-    } catch (e) {}
-
-    console.log(nanoleafClient);
-
-    goToDashboard();
   };
 
   return (
