@@ -21,5 +21,7 @@ module.exports = {
     'arrow-parens': 0,
     'react/jsx-one-expression-per-line': 0,
     'react/self-closing-comp': 1,
+    'react/jsx-props-no-spreading': 0,
+    'react/prop-types': 0
   },
 };
