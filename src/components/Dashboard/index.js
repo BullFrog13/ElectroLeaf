@@ -29,6 +29,7 @@ import PropTypes from 'prop-types';
 import CardActions from '@material-ui/core/CardActions';
 import { CardHeader, Divider } from '@material-ui/core';
 import { ChromePicker } from 'react-color';
+import { NanoleafClient } from 'nanoleaf-client';
 
 const drawerWidth = 240;
 
@@ -108,6 +109,7 @@ export default function Dashboard() {
     value: 30,
     ctValue: 1200,
     tabValue: 0,
+    selectedDevice: new NanoleafClient(new URL(history.location.state.location).hostname, history.location.state.token)
   });
 
   const [value, setValue] = React.useState(30);
@@ -143,8 +145,7 @@ export default function Dashboard() {
         className={classes.appBar}
         onClick={() => {
           history.push('/');
-        }}
-      >
+        }}>
         <Toolbar>
           <Typography variant="h6" noWrap>
             ElectroLeaf
@@ -156,8 +157,8 @@ export default function Dashboard() {
         variant="permanent"
         classes={{
           paper: classes.drawerPaper,
-        }}
-      >
+        }}>
+
         <div className={classes.toolbar} />
 
         <List>

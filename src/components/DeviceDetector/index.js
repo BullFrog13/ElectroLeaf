@@ -66,7 +66,9 @@ const useStyles = makeStyles((theme) => ({
 export default function DeviceDetector() {
   const classes = useStyles();
   const history = useHistory();
-  const [state, setState] = React.useState({ isDiscoverRunning: false, devices: [] });
+  const [state, setState] = React.useState({
+    isDiscoverRunning: false, devices: [], selectedDevice: {}
+  });
 
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set());
@@ -126,8 +128,24 @@ export default function DeviceDetector() {
     });
   };
 
-  const handleSelectDevice = (device) => {
-    // selectDevice(device);
+  const handleSelectDevice = device => {
+    setState({
+      ...state,
+      selectedDevice: device
+    });
+    handleNext();
+  };
+
+  const authorize = () => {
+    let client = new NanoleafClient(new URL(state.selectedDevice.location).hostname);
+
+    client.authorize().then(token => {
+      state.selectedDevice.token = token;
+      history.push({
+        pathname: '/dashboard',
+        state: state.selectedDevice
+      });
+    });
   };
 
   return (
@@ -164,35 +182,35 @@ export default function DeviceDetector() {
                 </Button>
               </div>
             ) : (
-              <div>
-                <Button
-                  disabled={activeStep === 0}
-                  onClick={handleBack}
-                  className={classes.button}
-                >
-                  Back
+                <div>
+                  <Button
+                    disabled={activeStep === 0}
+                    onClick={handleBack}
+                    className={classes.button}
+                  >
+                    Back
                 </Button>
-                {isStepOptional(activeStep) && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleSkip}
-                  className={classes.button}
-                >
-                  Skip
-                </Button>
-                )}
+                  {isStepOptional(activeStep) && (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleSkip}
+                      className={classes.button}
+                    >
+                      Skip
+                    </Button>
+                  )}
 
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleNext}
-                  className={classes.button}
-                >
-                  {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-                </Button>
-              </div>
-            )}
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleNext}
+                    className={classes.button}
+                  >
+                    {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                  </Button>
+                </div>
+              )}
           </div>
         </Grid>
         {activeStep === 0 && (
@@ -213,11 +231,23 @@ export default function DeviceDetector() {
           </Grid>
         )}
         {activeStep === 1 && (
-          <StepTwo handleSelectDevice devices={state.devices} classes />
+          <StepTwo handleSelectDevice={handleSelectDevice} devices={state.devices} classes />
         )}
         {activeStep === 2 && (
           <Grid item className={classes.grid} xs={4}>
-            <Avatar className={classes.avatar}>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+              onClick={authorize}>
+              Authorize
+            </Button>
+            {
+              state.isDiscoverRunning && <LinearProgress className={classes.loadingBar} variant="query" color="secondary" />
+            }
+            {/* <Avatar className={classes.avatar}>
               <DetailsOutlinedIcon />
             </Avatar>
             <Typography
@@ -252,7 +282,7 @@ export default function DeviceDetector() {
               disabled={!state.host}
             >
               Continue
-            </Button>
+            </Button> */}
           </Grid>
         )}
       </Grid>

@@ -18,9 +18,8 @@ export default function StepTwo({ handleSelectDevice, devices, classes }) {
           {devices.map((device) => (
             <ListItem
               button
-              onClick={handleSelectDevice}
-              key={device.deviceId}
-            >
+              onClick={() => handleSelectDevice(device)}
+              key={device.deviceId}>
               <ListItemIcon>
                 <FolderIcon />
               </ListItemIcon>
@@ -32,6 +31,6 @@ export default function StepTwo({ handleSelectDevice, devices, classes }) {
           ))}
         </List>
       </div>
-    </Grid>
+    </Grid >
   );
 }
