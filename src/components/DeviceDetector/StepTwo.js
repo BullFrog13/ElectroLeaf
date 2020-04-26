@@ -5,12 +5,25 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import FolderIcon from '@material-ui/icons/Folder';
+import { makeStyles } from '@material-ui/core/styles';
+import DetailsIcon from '@material-ui/icons/Details';
+import { green } from '@material-ui/core/colors';
 
-export default function StepTwo({ handleSelectDevice, devices, classes }) {
+const useStyles = makeStyles((theme) => ({
+  whiteText: {
+    color: '#eeeeee'
+  },
+  grayText: {
+    color: '#9e9e9e'
+  }
+}));
+
+export default function StepTwo({ handleSelectDevice, devices }) {
+  const classes = useStyles();
+
   return (
     <Grid item className={classes.grid} xs={4}>
-      <Typography variant="h6" className={classes.title}>
+      <Typography variant="h6" className={classes.whiteText}>
         Discovered Devices
       </Typography>
       <div className={classes.demo}>
@@ -21,11 +34,12 @@ export default function StepTwo({ handleSelectDevice, devices, classes }) {
               onClick={() => handleSelectDevice(device)}
               key={device.deviceId}>
               <ListItemIcon>
-                <FolderIcon />
+                <DetailsIcon fontSize="large" style={{ color: green[500] }} />
               </ListItemIcon>
               <ListItemText
                 primary={device.deviceId}
                 secondary={device.location}
+                classes={{ primary: classes.whiteText, secondary: classes.grayText }}
               />
             </ListItem>
           ))}
