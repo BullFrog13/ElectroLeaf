@@ -10,13 +10,14 @@ import axios from 'axios';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
-import StepTwo from './StepTwo';
 import SearchIcon from '@material-ui/icons/Search';
 import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
 import VpnKeyOutlinedIcon from '@material-ui/icons/VpnKeyOutlined';
-import StepConnector from "@material-ui/core/StepConnector";
-import clsx from "clsx";
-import PropTypes from "prop-types";
+import StepConnector from '@material-ui/core/StepConnector';
+import clsx from 'clsx';
+import PropTypes from 'prop-types';
+import StepTwo from './StepTwo';
+import { updateConfig } from '../services/config-service';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -27,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: -theme.spacing(8),
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   avatar: {
     margin: theme.spacing(1),
@@ -64,58 +65,58 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
   },
   stepText: {
-    color: 'white'
+    color: 'white',
   },
   title: {
-    color: 'white'
-  }
+    color: 'white',
+  },
 }));
 
 const ColorlibConnector = withStyles({
   alternativeLabel: {
-    top: 22
+    top: 22,
   },
   active: {
-    "& $line": {
+    '& $line': {
       backgroundImage:
-        "linear-gradient( 95deg,rgb(242,113,33) 0%,rgb(233,64,87) 50%,rgb(138,35,135) 100%)"
-    }
+        'linear-gradient( 95deg,rgb(242,113,33) 0%,rgb(233,64,87) 50%,rgb(138,35,135) 100%)',
+    },
   },
   completed: {
-    "& $line": {
+    '& $line': {
       backgroundImage:
-        "linear-gradient( 95deg,rgb(242,113,33) 0%,rgb(233,64,87) 50%,rgb(138,35,135) 100%)"
-    }
+        'linear-gradient( 95deg,rgb(242,113,33) 0%,rgb(233,64,87) 50%,rgb(138,35,135) 100%)',
+    },
   },
   line: {
     height: 3,
     border: 0,
-    backgroundColor: "#eaeaf0",
-    borderRadius: 1
-  }
+    backgroundColor: '#eaeaf0',
+    borderRadius: 1,
+  },
 })(StepConnector);
 
 const useColorlibStepIconStyles = makeStyles({
   root: {
-    backgroundColor: "#ccc",
+    backgroundColor: '#ccc',
     zIndex: 1,
-    color: "#fff",
+    color: '#fff',
     width: 50,
     height: 50,
-    display: "flex",
-    borderRadius: "50%",
-    justifyContent: "center",
-    alignItems: "center"
+    display: 'flex',
+    borderRadius: '50%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   active: {
     backgroundImage:
-      "linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)",
-    boxShadow: "0 4px 10px 0 rgba(0,0,0,.25)"
+      'linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)',
+    boxShadow: '0 4px 10px 0 rgba(0,0,0,.25)',
   },
   completed: {
     backgroundImage:
-      "linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)"
-  }
+      'linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)',
+  },
 });
 
 const ColorlibStepIcon = props => {
@@ -125,20 +126,20 @@ const ColorlibStepIcon = props => {
   const icons = {
     1: <SearchIcon />,
     2: <PlaylistAddCheckIcon />,
-    3: <VpnKeyOutlinedIcon />
+    3: <VpnKeyOutlinedIcon />,
   };
 
   return (
     <div
       className={clsx(classes.root, {
         [classes.active]: active,
-        [classes.completed]: completed
+        [classes.completed]: completed,
       })}
     >
       {icons[String(props.icon)]}
     </div>
   );
-}
+};
 
 ColorlibStepIcon.propTypes = {
   /**
@@ -152,14 +153,15 @@ ColorlibStepIcon.propTypes = {
   /**
    * The label displayed in the step icon.
    */
-  icon: PropTypes.node
+  icon: PropTypes.node,
 };
 
 export default function DeviceDetector() {
   const classes = useStyles();
   const history = useHistory();
+
   const [state, setState] = React.useState({
-    isDiscoverRunning: false, devices: [], selectedDevice: {}
+    isDiscoverRunning: false, devices: [], selectedDevice: {},
   });
 
   const [activeStep, setActiveStep] = React.useState(0);
@@ -180,6 +182,7 @@ export default function DeviceDetector() {
       const devices = res.data.filter(
         (device, index, self) => index === self.findIndex((t) => t.uuid === device.uuid),
       );
+
       setState({
         ...state,
         devices,
@@ -192,19 +195,21 @@ export default function DeviceDetector() {
   const handleSelectDevice = device => {
     setState({
       ...state,
-      selectedDevice: device
+      selectedDevice: device,
     });
     handleNext();
   };
 
   const authorize = () => {
-    let client = new NanoleafClient(new URL(state.selectedDevice.location).hostname);
+    const client = new NanoleafClient(new URL(state.selectedDevice.location).hostname);
 
     client.authorize().then(token => {
       state.selectedDevice.token = token;
-      history.push({
-        pathname: '/dashboard',
-        state: state.selectedDevice
+      updateConfig(state.selectedDevice).then(() => {
+        history.push({
+          pathname: '/dashboard',
+          state: state.selectedDevice,
+        });
       });
     });
   };
