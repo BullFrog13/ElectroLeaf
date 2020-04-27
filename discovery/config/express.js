@@ -18,11 +18,11 @@ const c = {
 
 function broadcastSsdp(socket) {
   const query = Buffer.from( // eslint-disable-line no-undef
-    'M-SEARCH * HTTP/1.1\r\n' +
-    `HOST: ${c.SSDP_DEFAULT_IP}:${c.SSDP_DEFAULT_PORT}\r\n` +
-    'MAN: "ssdp:discover"\r\n' +
-    'MX: 1\r\n' +
-    `ST: ${c.NANOLEAF_AURORA_TARGET}\r\n\r\n`
+    'M-SEARCH * HTTP/1.1\r\n'
+    + `HOST: ${c.SSDP_DEFAULT_IP}:${c.SSDP_DEFAULT_PORT}\r\n`
+    + 'MAN: "ssdp:discover"\r\n'
+    + 'MX: 1\r\n'
+    + `ST: ${c.NANOLEAF_AURORA_TARGET}\r\n\r\n`,
   );
 
   socket.send(query, 0, query.length, c.SSDP_DEFAULT_PORT, c.SSDP_DEFAULT_IP);
@@ -32,11 +32,11 @@ function discoverNanoleaf() {
   const socket = dgram.createSocket('udp4');
   const devices = [];
 
-  socket.on('listening', function () {
+  socket.on('listening', () => {
     broadcastSsdp(socket);
   });
 
-  socket.on('message', function (chunk, info) { // eslint-disable-line no-unused-vars
+  socket.on('message', (chunk, info) => { // eslint-disable-line no-unused-vars
     console.log('message');
     const response = chunk
       .toString()
