@@ -14,14 +14,11 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ChangeHistoryIcon from '@material-ui/icons/ChangeHistory';
 import { useHistory } from 'react-router-dom';
 import AppsIcon from '@material-ui/icons/Apps';
-import Switch from '@material-ui/core/Switch';
 import Slider from '@material-ui/core/Slider';
-import ColorPicker from 'material-ui-color-picker';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
-import NanoleafImage from '../../assets/images/img.jpg';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
@@ -30,6 +27,7 @@ import CardActions from '@material-ui/core/CardActions';
 import { CardHeader, Divider } from '@material-ui/core';
 import { ChromePicker } from 'react-color';
 import { NanoleafClient } from 'nanoleaf-client';
+import NanoleafImage from '../../assets/images/img.jpg';
 
 const drawerWidth = 240;
 
@@ -68,7 +66,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function TabPanel(props) {
-  const { children, tabValue, index, ...other } = props;
+  const {
+    children, tabValue, index, ...other
+  } = props;
 
   return (
     <Typography
@@ -109,7 +109,9 @@ export default function Dashboard() {
     value: 30,
     ctValue: 1200,
     tabValue: 0,
-    selectedDevice: new NanoleafClient(new URL(history.location.state.location).hostname, history.location.state.token)
+    selectedDevice: new NanoleafClient(
+      new URL(history.location.state.location).hostname, history.location.state.token,
+    ),
   });
 
   const [value, setValue] = React.useState(30);
@@ -121,19 +123,19 @@ export default function Dashboard() {
     setState({ ...state, [event.target.name]: event.target.checked });
   };
 
-  const handleTabsChange = (event, newValue) => {
+  const handleTabsChange = (_event, newValue) => {
     setTabValue(newValue);
   };
 
-  const handleBrightnessSliderChange = (event, newValue) => {
+  const handleBrightnessSliderChange = (_event, newValue) => {
     setValue(newValue);
   };
 
-  const handleCtSliderChange = (event, newValue) => {
+  const handleCtSliderChange = (_event, newValue) => {
     setCtValue(newValue);
   };
 
-  const handleColorChange = (color, event) => {
+  const handleColorChange = (color) => {
     setColorValue(color);
   };
 
@@ -145,7 +147,8 @@ export default function Dashboard() {
         className={classes.appBar}
         onClick={() => {
           history.push('/');
-        }}>
+        }}
+      >
         <Toolbar>
           <Typography variant="h6" noWrap>
             ElectroLeaf
@@ -157,7 +160,8 @@ export default function Dashboard() {
         variant="permanent"
         classes={{
           paper: classes.drawerPaper,
-        }}>
+        }}
+      >
 
         <div className={classes.toolbar} />
 
@@ -166,13 +170,13 @@ export default function Dashboard() {
             <ListItemIcon>
               <AppsIcon color="secondary" />
             </ListItemIcon>
-            <ListItemText primary={'General'} />
+            <ListItemText primary="General" />
           </ListItem>
           <ListItem button>
             <ListItemIcon>
               <ChangeHistoryIcon color="secondary" />
             </ListItemIcon>
-            <ListItemText primary={'Devices'} />
+            <ListItemText primary="Devices" />
           </ListItem>
         </List>
       </Drawer>
@@ -216,13 +220,8 @@ export default function Dashboard() {
 
                 <CardContent className={classes.colorCard}>
                   <TabPanel tabValue={tabValue} index={0}>
-                    {/* <ColorPicker
-                      name='color'
-                      defaultValue='#000'
-                      // value={this.state.color} - for controlled component
-                      onChange={color => console.log(color)} /> */}
                     <ChromePicker
-                      disableAlpha={true}
+                      disableAlpha
                       onChange={handleColorChange}
                       color={colorValue}
                     />
@@ -243,7 +242,7 @@ export default function Dashboard() {
                 <CardHeader
                   title="Brightness"
                   titleTypographyProps={{ variant: 'h6' }}
-                ></CardHeader>
+                />
                 <CardContent>
                   <Slider
                     value={value}
@@ -268,7 +267,7 @@ export default function Dashboard() {
                 <CardHeader
                   title="Color Temperature"
                   titleTypographyProps={{ variant: 'h6' }}
-                ></CardHeader>
+                />
                 <CardContent>
                   <Slider
                     value={ctValue}
@@ -295,7 +294,7 @@ export default function Dashboard() {
                 <CardHeader
                   title="Theme"
                   titleTypographyProps={{ variant: 'h6' }}
-                ></CardHeader>
+                />
                 <CardContent>
                   <Typography
                     className={classes.title}
@@ -318,7 +317,7 @@ export default function Dashboard() {
                 <CardHeader
                   title="Status"
                   titleTypographyProps={{ variant: 'h6' }}
-                ></CardHeader>
+                />
                 <CardContent>
                   <Typography
                     className={classes.title}

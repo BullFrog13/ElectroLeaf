@@ -17,7 +17,7 @@ import StepConnector from '@material-ui/core/StepConnector';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import StepTwo from './StepTwo';
-import { updateConfig } from '../services/config-service';
+import { updateConfig, getConfig } from '../services/config-service';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -161,7 +161,10 @@ export default function DeviceDetector() {
   const history = useHistory();
 
   const [state, setState] = React.useState({
-    isDiscoverRunning: false, devices: [], selectedDevice: {},
+    isDiscoverRunning: false,
+    devices: [],
+    selectedDevice: {},
+    configDevices: [],
   });
 
   const [activeStep, setActiveStep] = React.useState(0);
@@ -169,8 +172,25 @@ export default function DeviceDetector() {
 
   const steps = ['Discover devices', 'Select device', 'Authorize device'];
 
+  const loginWithExistingDevice = () => {
+    getConfig().then((res) => {
+      const selectedConfigDevice = res.find(
+        (_device, index, self) => index === self.findIndex(t => t.selectedDevice && t.token),
+      );
+
+      if (selectedConfigDevice) {
+        history.push({
+          pathname: '/dashboard',
+          state: selectedConfigDevice,
+        });
+      }
+    });
+  };
+
+  loginWithExistingDevice();
+
   const handleNext = () => {
-    let newSkipped = skipped;
+    const newSkipped = skipped;
 
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
     setSkipped(newSkipped);
@@ -204,8 +224,12 @@ export default function DeviceDetector() {
     const client = new NanoleafClient(new URL(state.selectedDevice.location).hostname);
 
     client.authorize().then(token => {
+      const selectedDevice = state.devices.find(d => d.uuid === state.selectedDevice.uuid);
+      selectedDevice.token = token;
+      selectedDevice.selectedDevice = true;
       state.selectedDevice.token = token;
-      updateConfig(state.selectedDevice).then(() => {
+
+      updateConfig(state.devices).then(() => {
         history.push({
           pathname: '/dashboard',
           state: state.selectedDevice,
@@ -224,15 +248,13 @@ export default function DeviceDetector() {
             connector={<ColorlibConnector />}
             className={classes.stepper}
           >
-            {steps.map((label) => {
-              return (
-                <Step key={label}>
-                  <StepLabel StepIconComponent={ColorlibStepIcon}>
-                    <p className={classes.stepText}>{label}</p>
-                  </StepLabel>
-                </Step>
-              );
-            })}
+            {steps.map((label) => (
+              <Step key={label}>
+                <StepLabel StepIconComponent={ColorlibStepIcon}>
+                  <p className={classes.stepText}>{label}</p>
+                </StepLabel>
+              </Step>
+            ))}
           </Stepper>
         </Grid>
         {activeStep === 0 && (
@@ -263,7 +285,8 @@ export default function DeviceDetector() {
               variant="contained"
               color="primary"
               className={classes.submit}
-              onClick={authorize}>
+              onClick={authorize}
+            >
               Authorize
             </Button>
             {
