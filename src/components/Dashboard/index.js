@@ -126,6 +126,7 @@ export default function Dashboard() {
   useEffect(() => {
     getNanoleafInfo().then(response => {
       setValue(response.state.brightness.value);
+      setCtValue(response.state.ct.value);
       setSelectedDeviceState(response);
     });
   }, []);
@@ -144,6 +145,10 @@ export default function Dashboard() {
 
   const handleBrightnessSliderChange = (_event, newValue) => {
     setValue(newValue);
+  };
+
+  const handleCommitedCtChange = (_event, newValue) => {
+    state.selectedDevice.setColorTemperature(newValue);
   };
 
   const handleCtSliderChange = (_event, newValue) => {
@@ -287,6 +292,7 @@ export default function Dashboard() {
                 <CardContent>
                   <Slider
                     value={ctValue}
+                    onChangeCommitted={handleCommitedCtChange}
                     onChange={handleCtSliderChange}
                     aria-labelledby="continuous-slider"
                     min={1200}
