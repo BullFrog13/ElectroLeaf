@@ -5,11 +5,11 @@ import PlaylistAddCheckIcon from '@material-ui/icons/PlaylistAddCheck';
 import VpnKeyOutlinedIcon from '@material-ui/icons/VpnKeyOutlined';
 import clsx from 'clsx';
 
-const useColorlibStepIconStyles = makeStyles({
+const useIconStyles = makeStyles((theme) => ({
   root: {
-    backgroundColor: '#ccc',
+    backgroundColor: theme.palette.primary.contrastText,
     zIndex: 1,
-    color: '#fff',
+    color: theme.palette.primary.main,
     width: 50,
     height: 50,
     display: 'flex',
@@ -18,18 +18,16 @@ const useColorlibStepIconStyles = makeStyles({
     alignItems: 'center',
   },
   active: {
-    backgroundImage:
-      'linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)',
+    backgroundColor: theme.palette.secondary.main,
     boxShadow: '0 4px 10px 0 rgba(0,0,0,.25)',
   },
   completed: {
-    backgroundImage:
-      'linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)',
+    backgroundColor: theme.palette.secondary.main,
   },
-});
+}));
 
 export default function CustomStepIcon({ active, completed, icon }) {
-  const classes = useColorlibStepIconStyles();
+  const classes = useIconStyles();
 
   const icons = {
     1: <SearchIcon />,
@@ -44,7 +42,7 @@ export default function CustomStepIcon({ active, completed, icon }) {
         [classes.completed]: completed,
       })}
     >
-      {icons[String(icon)]}
+      {icons[icon]}
     </div>
   );
 }

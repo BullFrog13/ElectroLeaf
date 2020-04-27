@@ -50,14 +50,8 @@ const useStyles = makeStyles((theme) => ({
   displayCenter: {
     textAlign: 'center',
   },
-  stepper: {
-    backgroundColor: 'transparent',
-  },
   loadingBar: {
     width: '100%',
-  },
-  stepText: {
-    color: 'white',
   },
   title: {
     color: 'white',
@@ -70,18 +64,14 @@ export default function DeviceDetector() {
   const history = useHistory();
 
   const [state, setState] = React.useState({
-    isDiscoverRunning: false, devices: [], selectedDevice: {},
+    isDiscoverRunning: false,
+    devices: [],
+    selectedDevice: {},
+    activeStep: 0,
   });
 
-  const [activeStep, setActiveStep] = React.useState(0);
-  const [skipped, setSkipped] = React.useState(new Set());
-
-
   const handleNext = () => {
-    const newSkipped = skipped;
-
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    setSkipped(newSkipped);
+    setState({ ...state, activeStep: state.activeStep + 1 });
   };
 
   const discover = () => {
@@ -128,7 +118,7 @@ export default function DeviceDetector() {
         <Grid item xs={12}>
           <CustomStepper activeStep={state.activeStep} />
         </Grid>
-        {activeStep === 0 && (
+        {state.activeStep === 0 && (
           <Grid item className={classes.grid} xs={4}>
             <Button
               type="submit"
@@ -145,10 +135,10 @@ export default function DeviceDetector() {
             }
           </Grid>
         )}
-        {activeStep === 1 && (
+        {state.activeStep === 1 && (
           <StepTwo handleSelectDevice={handleSelectDevice} devices={state.devices} />
         )}
-        {activeStep === 2 && (
+        {state.activeStep === 2 && (
           <Grid item className={classes.grid} xs={4}>
             <Button
               type="submit"

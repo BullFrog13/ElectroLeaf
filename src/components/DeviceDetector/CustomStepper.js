@@ -6,30 +6,27 @@ import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import CustomStepIcon from './CustomStepIcon';
 
-
 const useStyles = makeStyles((theme) => ({
   stepper: {
     backgroundColor: 'transparent',
   },
-  stepText: {
+  label: {
     color: theme.palette.primary.contrastText,
   },
 }));
 
-const ColorlibConnector = withStyles({
+const ColorlibConnector = withStyles(theme => ({
   alternativeLabel: {
     top: 22,
   },
   active: {
     '& $line': {
-      backgroundImage:
-        'linear-gradient( 95deg,rgb(242,113,33) 0%,rgb(233,64,87) 50%,rgb(138,35,135) 100%)',
+      backgroundColor: theme.palette.secondary.main,
     },
   },
   completed: {
     '& $line': {
-      backgroundImage:
-        'linear-gradient( 95deg,rgb(242,113,33) 0%,rgb(233,64,87) 50%,rgb(138,35,135) 100%)',
+      backgroundColor: theme.palette.secondary.main,
     },
   },
   line: {
@@ -38,12 +35,12 @@ const ColorlibConnector = withStyles({
     backgroundColor: '#eaeaf0',
     borderRadius: 1,
   },
-})(StepConnector);
+}))(StepConnector);
+
 
 export default function CustomStepper({ activeStep }) {
   const classes = useStyles();
   const steps = ['Discover devices', 'Select device', 'Authorize device'];
-
 
   return (
     <Stepper
@@ -52,10 +49,10 @@ export default function CustomStepper({ activeStep }) {
       connector={<ColorlibConnector />}
       className={classes.stepper}
     >
-      {steps.map((step) => (
-        <Step key={step}>
+      {steps.map((label) => (
+        <Step key={label}>
           <StepLabel StepIconComponent={CustomStepIcon}>
-            <p className={classes.stepText}>{step}</p>
+            <p className={classes.label}>{label}</p>
           </StepLabel>
         </Step>
       ))}
