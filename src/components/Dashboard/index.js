@@ -161,7 +161,7 @@ export default function Dashboard() {
         position="fixed"
         className={classes.appBar}
         onClick={() => {
-          history.push('/');
+          history.push('/', { isForceDetectNew: true });
         }}
       >
         <Toolbar>

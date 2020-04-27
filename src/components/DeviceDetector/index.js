@@ -7,6 +7,7 @@ import { useHistory } from 'react-router-dom';
 import { NanoleafClient } from 'nanoleaf-client';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import axios from 'axios';
+import { Typography } from '@material-ui/core';
 import CustomStepper from './CustomStepper';
 import StepTwo from './StepTwo';
 import { updateConfig, getConfig } from '../services/config-service';
@@ -50,14 +51,8 @@ const useStyles = makeStyles((theme) => ({
   displayCenter: {
     textAlign: 'center',
   },
-  stepper: {
-    backgroundColor: 'transparent',
-  },
   loadingBar: {
     width: '100%',
-  },
-  stepText: {
-    color: 'white',
   },
   title: {
     color: 'white',
@@ -73,12 +68,12 @@ export default function DeviceDetector() {
     isDiscoverRunning: false,
     devices: [],
     selectedDevice: {},
+    activeStep: 0,
     configDevices: [],
   });
 
-  const [activeStep, setActiveStep] = React.useState(0);
-  const [skipped, setSkipped] = React.useState(new Set());
-
+  let isForceDetectNew = false;
+  if (history.location.state) isForceDetectNew = history.location.state.isForceDetectNew;
 
   const loginWithExistingDevice = () => {
     getConfig().then((res) => {
@@ -95,14 +90,7 @@ export default function DeviceDetector() {
     });
   };
 
-  loginWithExistingDevice();
-
-  const handleNext = () => {
-    const newSkipped = skipped;
-
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    setSkipped(newSkipped);
-  };
+  if (!isForceDetectNew) loginWithExistingDevice();
 
   const discover = () => {
     setState({ ...state, isDiscoverRunning: true });
@@ -115,8 +103,8 @@ export default function DeviceDetector() {
         ...state,
         devices,
         isDiscoverRunning: false,
+        activeStep: state.activeStep + 1,
       });
-      handleNext();
     });
   };
 
@@ -124,8 +112,8 @@ export default function DeviceDetector() {
     setState({
       ...state,
       selectedDevice: device,
+      activeStep: state.activeStep + 1,
     });
-    handleNext();
   };
 
   const authorize = () => {
@@ -152,7 +140,7 @@ export default function DeviceDetector() {
         <Grid item xs={12}>
           <CustomStepper activeStep={state.activeStep} />
         </Grid>
-        {activeStep === 0 && (
+        {state.activeStep === 0 && (
           <Grid item className={classes.grid} xs={4}>
             <Button
               type="submit"
@@ -169,11 +157,14 @@ export default function DeviceDetector() {
             }
           </Grid>
         )}
-        {activeStep === 1 && (
+        {state.activeStep === 1 && (
           <StepTwo handleSelectDevice={handleSelectDevice} devices={state.devices} />
         )}
-        {activeStep === 2 && (
+        {state.activeStep === 2 && (
           <Grid item className={classes.grid} xs={4}>
+            <Typography className={classes.whiteText}>
+              Hold the on-off button down for 5-7 seconds until the LED starts flashing in a pattern.
+            </Typography>
             <Button
               type="submit"
               fullWidth
@@ -184,9 +175,6 @@ export default function DeviceDetector() {
             >
               Authorize
             </Button>
-            {
-              state.isDiscoverRunning && <LinearProgress className={classes.loadingBar} variant="query" color="secondary" />
-            }
           </Grid>
         )}
       </Grid>
