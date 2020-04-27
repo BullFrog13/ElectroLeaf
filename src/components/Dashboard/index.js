@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
@@ -103,9 +103,8 @@ export default function Dashboard() {
 
   if (!history.location.state) history.push('');
 
-  const [state, setState] = React.useState({
+  const [state, setState] = useState({
     checkedA: true,
-    checkedB: true,
     value: 30,
     ctValue: 1200,
     tabValue: 0,
@@ -114,10 +113,22 @@ export default function Dashboard() {
     ),
   });
 
-  const [value, setValue] = React.useState(30);
-  const [ctValue, setCtValue] = React.useState(1200);
-  const [tabValue, setTabValue] = React.useState(0);
-  const [colorValue, setColorValue] = React.useState('#ff0000');
+  const [selectedDeviceState, setSelectedDeviceState] = useState({ });
+  const [value, setValue] = useState(30);
+  const [ctValue, setCtValue] = useState(1200);
+  const [tabValue, setTabValue] = useState(0);
+  const [colorValue, setColorValue] = useState('#ff0000');
+
+  const getNanoleafInfo = () => state.selectedDevice.getInfo().then(response => response, err => {
+    console.log('TEST', err);
+  });
+
+  useEffect(() => {
+    getNanoleafInfo().then(response => {
+      setValue(response.state.brightness.value);
+      setSelectedDeviceState(response);
+    });
+  }, []);
 
   const handleChange = (event) => {
     setState({ ...state, [event.target.name]: event.target.checked });
@@ -125,6 +136,10 @@ export default function Dashboard() {
 
   const handleTabsChange = (_event, newValue) => {
     setTabValue(newValue);
+  };
+
+  const handleCommitedBrightnessChange = (_event, newValue) => {
+    state.selectedDevice.setBrightness(newValue);
   };
 
   const handleBrightnessSliderChange = (_event, newValue) => {
@@ -246,6 +261,7 @@ export default function Dashboard() {
                 <CardContent>
                   <Slider
                     value={value}
+                    onChangeCommitted={handleCommitedBrightnessChange}
                     onChange={handleBrightnessSliderChange}
                     aria-labelledby="continuous-slider"
                     marks={[
