@@ -9,7 +9,7 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import axios from 'axios';
 import CustomStepper from './CustomStepper';
 import StepTwo from './StepTwo';
-import { updateConfig } from '../services/config-service';
+import { updateConfig, getConfig } from '../services/config-service';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -68,7 +68,25 @@ export default function DeviceDetector() {
     devices: [],
     selectedDevice: {},
     activeStep: 0,
+    configDevices: [],
   });
+
+  const loginWithExistingDevice = () => {
+    getConfig().then((res) => {
+      const selectedConfigDevice = res.find(
+        (_device, index, self) => index === self.findIndex(t => t.selectedDevice && t.token),
+      );
+
+      if (selectedConfigDevice) {
+        history.push({
+          pathname: '/dashboard',
+          state: selectedConfigDevice,
+        });
+      }
+    });
+  };
+
+  loginWithExistingDevice();
 
   const handleNext = () => {
     setState({ ...state, activeStep: state.activeStep + 1 });
@@ -102,8 +120,12 @@ export default function DeviceDetector() {
     const client = new NanoleafClient(new URL(state.selectedDevice.location).hostname);
 
     client.authorize().then(token => {
+      const selectedDevice = state.devices.find(d => d.uuid === state.selectedDevice.uuid);
+      selectedDevice.token = token;
+      selectedDevice.selectedDevice = true;
       state.selectedDevice.token = token;
-      updateConfig(state.selectedDevice).then(() => {
+
+      updateConfig(state.devices).then(() => {
         history.push({
           pathname: '/dashboard',
           state: state.selectedDevice,
