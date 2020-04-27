@@ -7,6 +7,7 @@ import { useHistory } from 'react-router-dom';
 import { NanoleafClient } from 'nanoleaf-client';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import axios from 'axios';
+import { Typography } from '@material-ui/core';
 import CustomStepper from './CustomStepper';
 import StepTwo from './StepTwo';
 import { updateConfig, getConfig } from '../services/config-service';
@@ -71,16 +72,16 @@ export default function DeviceDetector() {
     configDevices: [],
   });
 
+  let isForceDetectNew = false;
+  if (history.location.state) isForceDetectNew = history.location.state.isForceDetectNew;
+
   const loginWithExistingDevice = () => {
     getConfig().then((res) => {
       const selectedConfigDevice = res.find(
         (_device, index, self) => index === self.findIndex(t => t.selectedDevice && t.token),
       );
 
-      let isForceDetectNew = false;
-      if (history.location.state) isForceDetectNew = history.location.state.isForceDetectNew;
-
-      if (selectedConfigDevice && !isForceDetectNew) {
+      if (selectedConfigDevice) {
         history.push({
           pathname: '/dashboard',
           state: selectedConfigDevice,
@@ -89,11 +90,7 @@ export default function DeviceDetector() {
     });
   };
 
-  loginWithExistingDevice();
-
-  const handleNext = () => {
-    setState({ ...state, activeStep: state.activeStep + 1 });
-  };
+  if (!isForceDetectNew) loginWithExistingDevice();
 
   const discover = () => {
     setState({ ...state, isDiscoverRunning: true });
@@ -106,8 +103,8 @@ export default function DeviceDetector() {
         ...state,
         devices,
         isDiscoverRunning: false,
+        activeStep: state.activeStep + 1,
       });
-      handleNext();
     });
   };
 
@@ -115,8 +112,8 @@ export default function DeviceDetector() {
     setState({
       ...state,
       selectedDevice: device,
+      activeStep: state.activeStep + 1,
     });
-    handleNext();
   };
 
   const authorize = () => {
@@ -165,6 +162,9 @@ export default function DeviceDetector() {
         )}
         {state.activeStep === 2 && (
           <Grid item className={classes.grid} xs={4}>
+            <Typography className={classes.whiteText}>
+              Hold the on-off button down for 5-7 seconds until the LED starts flashing in a pattern.
+            </Typography>
             <Button
               type="submit"
               fullWidth
@@ -175,9 +175,6 @@ export default function DeviceDetector() {
             >
               Authorize
             </Button>
-            {
-              state.isDiscoverRunning && <LinearProgress className={classes.loadingBar} variant="query" color="secondary" />
-            }
           </Grid>
         )}
       </Grid>
