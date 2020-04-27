@@ -10,11 +10,11 @@ import DetailsIcon from '@material-ui/icons/Details';
 import { green } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme) => ({
-  whiteText: {
-    color: '#eeeeee',
-  },
   grayText: {
-    color: '#9e9e9e',
+    color: theme.palette.primary.light,
+  },
+  whiteText: {
+    color: theme.palette.primary.contrastText,
   },
 }));
 
