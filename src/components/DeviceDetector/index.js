@@ -77,7 +77,10 @@ export default function DeviceDetector() {
         (_device, index, self) => index === self.findIndex(t => t.selectedDevice && t.token),
       );
 
-      if (selectedConfigDevice) {
+      let isForceDetectNew = false;
+      if (history.location.state) isForceDetectNew = history.location.state.isForceDetectNew;
+
+      if (selectedConfigDevice && !isForceDetectNew) {
         history.push({
           pathname: '/dashboard',
           state: selectedConfigDevice,
