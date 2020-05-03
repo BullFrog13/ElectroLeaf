@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
@@ -16,9 +16,7 @@ import { useHistory } from 'react-router-dom';
 import AppsIcon from '@material-ui/icons/Apps';
 import Slider from '@material-ui/core/Slider';
 import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
@@ -27,7 +25,7 @@ import CardActions from '@material-ui/core/CardActions';
 import { CardHeader, Divider } from '@material-ui/core';
 import { ChromePicker } from 'react-color';
 import { NanoleafClient } from 'nanoleaf-client';
-import NanoleafImage from '../../assets/images/img.jpg';
+import NanoleafLayout from 'nanoleaf-layout/lib/NanoleafLayout';
 
 const drawerWidth = 240;
 
@@ -103,7 +101,7 @@ export default function Dashboard() {
 
   if (!history.location.state) history.push('');
 
-  const [state, setState] = useState({
+  const [state] = useState({
     checkedA: true,
     value: 30,
     ctValue: 1200,
@@ -113,27 +111,25 @@ export default function Dashboard() {
     ),
   });
 
-  const [selectedDeviceState, setSelectedDeviceState] = useState({ });
+  const [selectedDeviceState, setSelectedDeviceState] = useState({
+    numPanels: 0,
+    sideLength: 0,
+    positionData: [],
+  });
   const [value, setValue] = useState(30);
   const [ctValue, setCtValue] = useState(1200);
   const [tabValue, setTabValue] = useState(0);
   const [colorValue, setColorValue] = useState('#ff0000');
 
-  const getNanoleafInfo = () => state.selectedDevice.getInfo().then(response => response, err => {
-    console.log('TEST', err);
-  });
+  const getNanoleafInfo = () => state.selectedDevice.getInfo().then(response => response);
 
   useEffect(() => {
     getNanoleafInfo().then(response => {
       setValue(response.state.brightness.value);
       setCtValue(response.state.ct.value);
-      setSelectedDeviceState(response);
+      setSelectedDeviceState(response.panelLayout.layout);
     });
   }, []);
-
-  const handleChange = (event) => {
-    setState({ ...state, [event.target.name]: event.target.checked });
-  };
 
   const handleTabsChange = (_event, newValue) => {
     setTabValue(newValue);
@@ -160,6 +156,7 @@ export default function Dashboard() {
   };
 
   return (
+
     <div className={classes.root}>
       <CssBaseline />
       <AppBar
@@ -205,24 +202,7 @@ export default function Dashboard() {
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={6}>
-              {/* <div>
-                <Switch
-                  checked={state.checkedA}
-                  onChange={handleChange}
-                  name="checkedA"
-                  inputProps={{ 'aria-label': 'secondary checkbox' }}
-                />
-              </div> */}
-
-              <Card>
-                <CardActionArea>
-                  <CardMedia
-                    className={classes.media}
-                    image={NanoleafImage}
-                    title="Contemplative Reptile"
-                  />
-                </CardActionArea>
-              </Card>
+              <NanoleafLayout data={selectedDeviceState} svgStyle={{ height: '400px' }} />
             </Grid>
 
             <Grid item xs={12} md={6} lg={6}>
