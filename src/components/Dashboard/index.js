@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
@@ -82,8 +82,11 @@ const a11yProps = (index) => ({
 export default function Dashboard() {
   const classes = useStyles();
   const history = useHistory();
+  const query = new URLSearchParams(history.location.search);
+  const token = query.get('token');
+  const location = query.get('location');
 
-  if (!history.location.state) history.push('');
+  if (!(token && location)) history.push('');
 
   const [state] = useState({
     checkedA: true,
@@ -91,7 +94,7 @@ export default function Dashboard() {
     ctValue: 1200,
     tabValue: 0,
     selectedDevice: new NanoleafClient(
-      new URL(history.location.state.location).hostname, history.location.state.token,
+      new URL(location).hostname, token,
     ),
   });
 
@@ -105,13 +108,13 @@ export default function Dashboard() {
   const [tabValue, setTabValue] = useState(0);
   const [colorValue, setColorValue] = useState('#ff0000');
 
-  const getNanoleafInfo = () => state.selectedDevice.getInfo().then(response => response);
-
   useEffect(() => {
-    getNanoleafInfo().then(response => {
-      setValue(response.state.brightness.value);
-      setCtValue(response.state.ct.value);
-      setSelectedDeviceState(response.panelLayout.layout);
+    state.selectedDevice.getInfo().then(response => {
+      if (response.state) {
+        setValue(response.state.brightness.value);
+        setCtValue(response.state.ct.value);
+        setSelectedDeviceState(response.panelLayout.layout);
+      }
     });
   }, []);
 
