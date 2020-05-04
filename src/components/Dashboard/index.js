@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -22,7 +21,6 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
-import PropTypes from 'prop-types';
 import CardActions from '@material-ui/core/CardActions';
 import { CardHeader, Divider } from '@material-ui/core';
 import { ChromePicker } from 'react-color';
@@ -65,37 +63,23 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function TabPanel(props) {
-  const {
-    children, tabValue, index, ...other
-  } = props;
+const TabPanel = ({ children, tabValue, index, ...other }) => (
+  <Typography
+    component="div"
+    role="tabpanel"
+    hidden={tabValue !== index}
+    id={`simple-tabpanel-${index}`}
+    aria-labelledby={`simple-tab-${index}`}
+    {...other}
+  >
+    {tabValue === index && <Box p={3}>{children}</Box>}
+  </Typography>
+);
 
-  return (
-    <Typography
-      component="div"
-      role="tabpanel"
-      hidden={tabValue !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {tabValue === index && <Box p={3}>{children}</Box>}
-    </Typography>
-  );
-}
-
-TabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.any.isRequired,
-  tabValue: PropTypes.any.isRequired,
-};
-
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
+const a11yProps = (index) => ({
+  id: `simple-tab-${index}`,
+  'aria-controls': `simple-tabpanel-${index}`,
+});
 
 export default function Dashboard() {
   const classes = useStyles();
@@ -161,7 +145,6 @@ export default function Dashboard() {
 
   return (
     <div className={classes.root}>
-      <CssBaseline />
       <AppBar
         position="fixed"
         className={classes.appBar}

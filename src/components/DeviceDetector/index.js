@@ -10,7 +10,7 @@ import axios from 'axios';
 import { Typography } from '@material-ui/core';
 import CustomStepper from './CustomStepper';
 import StepTwo from './StepTwo';
-import { updateConfig, getConfig } from '../services/config-service';
+import { updateConfig, getConfig } from '../../services/config-service';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -72,8 +72,8 @@ export default function DeviceDetector() {
     configDevices: [],
   });
 
-  let isForceDetectNew = false;
-  if (history.location.state) isForceDetectNew = history.location.state.isForceDetectNew;
+  const isForceDetectNew = (history.location.state)
+    ? history.location.state.isForceDetectNew : false;
 
   const loginWithExistingDevice = () => {
     getConfig().then((res) => {
