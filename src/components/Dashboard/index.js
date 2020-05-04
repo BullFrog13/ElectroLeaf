@@ -82,68 +82,64 @@ const a11yProps = (index) => ({
 export default function Dashboard() {
   const classes = useStyles();
   const history = useHistory();
+
   const query = new URLSearchParams(history.location.search);
   const token = query.get('token');
   const location = query.get('location');
 
   if (!(token && location)) history.push('');
 
-  const [state] = useState({
+  const [state, setState] = useState({
     checkedA: true,
-    value: 30,
+    brightness: 30,
     ctValue: 1200,
     tabValue: 0,
-    selectedDevice: new NanoleafClient(
-      new URL(location).hostname, token,
-    ),
+    nanoleafClient: new NanoleafClient(new URL(location).hostname, token),
+    layout: {
+      numPanels: 0,
+      sideLength: 0,
+      positionData: [],
+    },
+    color: '#ff0000',
   });
-
-  const [selectedDeviceState, setSelectedDeviceState] = useState({
-    numPanels: 0,
-    sideLength: 0,
-    positionData: [],
-  });
-  const [value, setValue] = useState(30);
-  const [ctValue, setCtValue] = useState(1200);
-  const [tabValue, setTabValue] = useState(0);
-  const [colorValue, setColorValue] = useState('#ff0000');
 
   useEffect(() => {
-    state.selectedDevice.getInfo().then(response => {
+    state.nanoleafClient.getInfo().then(response => {
       if (response.state) {
-        setValue(response.state.brightness.value);
-        setCtValue(response.state.ct.value);
-        setSelectedDeviceState(response.panelLayout.layout);
+        setState({
+          brightness: response.state.brightness.value,
+          ctValue: response.state.ct.value,
+          layout: response.panelLayout.layout,
+        });
       }
     });
   }, []);
 
-  const handleTabsChange = (_event, newValue) => {
-    setTabValue(newValue);
+  const changeTabs = (_event, tabValue) => {
+    setState({ tabValue });
   };
 
-  const handleCommitedBrightnessChange = (_event, newValue) => {
-    state.selectedDevice.setBrightness(newValue);
+  const updateDeviceBrightness = (_event, brightness) => {
+    state.nanoleafClient.setBrightness(brightness);
   };
 
-  const handleBrightnessSliderChange = (_event, newValue) => {
-    setValue(newValue);
+  const updateBrightnessValue = (_event, brightness) => {
+    setState({ brightness });
   };
 
-  const handleCommitedCtChange = (_event, newValue) => {
-    state.selectedDevice.setColorTemperature(newValue);
+  const updateDeviceCt = (_event, ctValue) => {
+    state.nanoleafClient.setColorTemperature(ctValue);
   };
 
-  const handleCtSliderChange = (_event, newValue) => {
-    setCtValue(newValue);
+  const updateCtValue = (_event, ctValue) => {
+    setState({ ctValue });
   };
 
-  const handleColorChange = (color) => {
-    setColorValue(color);
+  const updateColor = (color) => {
+    setState({ color });
   };
 
   return (
-
     <div className={classes.root}>
       <AppBar
         position="fixed"
@@ -165,9 +161,7 @@ export default function Dashboard() {
           paper: classes.drawerPaper,
         }}
       >
-
         <div className={classes.toolbar} />
-
         <List>
           <ListItem button>
             <ListItemIcon>
@@ -188,14 +182,13 @@ export default function Dashboard() {
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={6}>
-              <NanoleafLayout data={selectedDeviceState} svgStyle={{ height: '400px' }} />
+              <NanoleafLayout data={state.layout} svgStyle={{ height: '400px' }} />
             </Grid>
-
             <Grid item xs={12} md={6} lg={6}>
               <Card>
                 <Tabs
-                  value={tabValue}
-                  onChange={handleTabsChange}
+                  value={state.tabValue}
+                  onChange={changeTabs}
                   aria-label="simple tabs example"
                   centered
                 >
@@ -203,19 +196,18 @@ export default function Dashboard() {
                   <Tab label="Hex" {...a11yProps(1)} />
                   <Tab label="HSL" {...a11yProps(2)} />
                 </Tabs>
-
                 <CardContent className={classes.colorCard}>
-                  <TabPanel tabValue={tabValue} index={0}>
+                  <TabPanel tabValue={state.tabValue} index={0}>
                     <ChromePicker
                       disableAlpha
-                      onChange={handleColorChange}
-                      color={colorValue}
+                      onChange={updateColor}
+                      color={state.color}
                     />
                   </TabPanel>
-                  <TabPanel tabValue={tabValue} index={1}>
+                  <TabPanel tabValue={state.tabValue} index={1}>
                     Item Two
                   </TabPanel>
-                  <TabPanel tabValue={tabValue} index={2}>
+                  <TabPanel tabValue={state.tabValue} index={2}>
                     Item Three
                   </TabPanel>
                 </CardContent>
@@ -231,9 +223,9 @@ export default function Dashboard() {
                 />
                 <CardContent>
                   <Slider
-                    value={value}
-                    onChangeCommitted={handleCommitedBrightnessChange}
-                    onChange={handleBrightnessSliderChange}
+                    value={state.brightness}
+                    onChangeCommitted={updateDeviceBrightness}
+                    onChange={updateBrightnessValue}
                     aria-labelledby="continuous-slider"
                     marks={[
                       { value: 0, label: '0' },
@@ -244,7 +236,7 @@ export default function Dashboard() {
                 <Divider />
                 <CardActions className={classes.alignCenter}>
                   <Typography align="center" variant="h6" color="textSecondary">
-                    {value}
+                    {state.brightness}
                   </Typography>
                 </CardActions>
               </Card>
@@ -257,9 +249,9 @@ export default function Dashboard() {
                 />
                 <CardContent>
                   <Slider
-                    value={ctValue}
-                    onChangeCommitted={handleCommitedCtChange}
-                    onChange={handleCtSliderChange}
+                    value={state.ctValue}
+                    onChangeCommitted={updateDeviceCt}
+                    onChange={updateCtValue}
                     aria-labelledby="continuous-slider"
                     min={1200}
                     max={6500}
@@ -272,7 +264,7 @@ export default function Dashboard() {
                 <Divider />
                 <CardActions className={classes.alignCenter}>
                   <Typography align="center" variant="h6" color="textSecondary">
-                    {ctValue}
+                    {state.ctValue}
                   </Typography>
                 </CardActions>
               </Card>
