@@ -97,13 +97,14 @@ export default function DeviceDetector() {
   if (!isForceDetectNew) tryUseSavedConfig();
 
   const discover = () => {
-    setState({ isDiscoverRunning: true });
+    setState({ ...state, isDiscoverRunning: true });
     axios.get('http://localhost:3001/discover').then((res) => {
       const devices = res.data.filter(
         (device, index, self) => index === self.findIndex(t => t.uuid === device.uuid),
       );
 
       setState({
+        ...state,
         devices,
         isDiscoverRunning: false,
         activeStep: state.activeStep + 1,
@@ -113,6 +114,7 @@ export default function DeviceDetector() {
 
   const selectDevice = device => {
     setState({
+      ...state,
       selectedDevice: device,
       activeStep: state.activeStep + 1,
     });
