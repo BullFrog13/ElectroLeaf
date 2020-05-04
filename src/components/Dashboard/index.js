@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
@@ -111,7 +111,7 @@ export default function Dashboard() {
     ),
   });
 
-  const [selectedDeviceState, setSelectedDeviceState] = useState({
+  const [panelLayout, setpanelLayout] = useState({
     numPanels: 0,
     sideLength: 0,
     positionData: [],
@@ -127,7 +127,7 @@ export default function Dashboard() {
     getNanoleafInfo().then(response => {
       setValue(response.state.brightness.value);
       setCtValue(response.state.ct.value);
-      setSelectedDeviceState(response.panelLayout.layout);
+      setpanelLayout(response.panelLayout.layout);
     });
   }, []);
 
@@ -202,7 +202,9 @@ export default function Dashboard() {
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={6}>
-              <NanoleafLayout data={selectedDeviceState} svgStyle={{ height: '400px' }} />
+              <Card>
+                <NanoleafLayout data={panelLayout} svgStyle={{ height: '400px' }} />
+              </Card>
             </Grid>
 
             <Grid item xs={12} md={6} lg={6}>
