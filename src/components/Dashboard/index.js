@@ -107,6 +107,7 @@ export default function Dashboard() {
     state.nanoleafClient.getInfo().then(response => {
       if (response.state) {
         setState({
+          ...state,
           brightness: response.state.brightness.value,
           ctValue: response.state.ct.value,
           layout: response.panelLayout.layout,
@@ -116,7 +117,7 @@ export default function Dashboard() {
   }, []);
 
   const changeTabs = (_event, tabValue) => {
-    setState({ tabValue });
+    setState({ ...state, tabValue });
   };
 
   const updateDeviceBrightness = (_event, brightness) => {
@@ -124,7 +125,7 @@ export default function Dashboard() {
   };
 
   const updateBrightnessValue = (_event, brightness) => {
-    setState({ brightness });
+    setState({ ...state, brightness });
   };
 
   const updateDeviceCt = (_event, ctValue) => {
@@ -132,11 +133,11 @@ export default function Dashboard() {
   };
 
   const updateCtValue = (_event, ctValue) => {
-    setState({ ctValue });
+    setState({ ...state, ctValue });
   };
 
   const updateColor = (color) => {
-    setState({ color });
+    setState({ ...state, color });
   };
 
   return (
@@ -182,7 +183,9 @@ export default function Dashboard() {
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={6}>
-              <NanoleafLayout data={state.layout} svgStyle={{ height: '400px' }} />
+              <Card>
+                <NanoleafLayout data={state.layout} svgStyle={{ height: '400px' }} />
+              </Card>
             </Grid>
             <Grid item xs={12} md={6} lg={6}>
               <Card>
