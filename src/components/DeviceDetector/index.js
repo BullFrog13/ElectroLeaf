@@ -10,7 +10,7 @@ import axios from 'axios';
 import { Typography } from '@material-ui/core';
 import CustomStepper from './CustomStepper';
 import StepTwo from './StepTwo';
-import { updateConfig, getConfig } from '../services/config-service';
+import { updateConfig, getConfig } from '../../services/config-service';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -72,31 +72,35 @@ export default function DeviceDetector() {
     configDevices: [],
   });
 
-  let isForceDetectNew = false;
-  if (history.location.state) isForceDetectNew = history.location.state.isForceDetectNew;
+  const isForceDetectNew = (history.location.state)
+    ? history.location.state.isForceDetectNew : false;
 
-  const loginWithExistingDevice = () => {
+  const goToDashboard = (location, token) => {
+    history.push({
+      pathname: '/dashboard',
+      search: `?location=${location}&token=${token}`,
+    });
+  };
+
+  const tryUseSavedConfig = () => {
     getConfig().then((res) => {
       const selectedConfigDevice = res.find(
         (_device, index, self) => index === self.findIndex(t => t.selectedDevice && t.token),
       );
 
-      if (selectedConfigDevice) {
-        history.push({
-          pathname: '/dashboard',
-          state: selectedConfigDevice,
-        });
+      if (selectedConfigDevice && (typeof selectedConfigDevice.token) === 'string') {
+        goToDashboard(selectedConfigDevice.location, selectedConfigDevice.token);
       }
     });
   };
 
-  if (!isForceDetectNew) loginWithExistingDevice();
+  if (!isForceDetectNew) tryUseSavedConfig();
 
   const discover = () => {
     setState({ ...state, isDiscoverRunning: true });
     axios.get('http://localhost:3001/discover').then((res) => {
       const devices = res.data.filter(
-        (device, index, self) => index === self.findIndex((t) => t.uuid === device.uuid),
+        (device, index, self) => index === self.findIndex(t => t.uuid === device.uuid),
       );
 
       setState({
@@ -120,16 +124,8 @@ export default function DeviceDetector() {
     const client = new NanoleafClient(new URL(state.selectedDevice.location).hostname);
 
     client.authorize().then(token => {
-      const selectedDevice = state.devices.find(d => d.uuid === state.selectedDevice.uuid);
-      selectedDevice.token = token;
-      selectedDevice.selectedDevice = true;
-      state.selectedDevice.token = token;
-
       updateConfig(state.devices).then(() => {
-        history.push({
-          pathname: '/dashboard',
-          state: state.selectedDevice,
-        });
+        goToDashboard(state.selectedDevice.location, token);
       });
     });
   };

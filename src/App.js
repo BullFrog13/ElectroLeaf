@@ -23,7 +23,6 @@ export default () => {
           component={() => componentThemeWrapper(DeviceDetector)}
         />
         <Route
-          exact
           path="/dashboard"
           component={() => componentThemeWrapper(Dashboard)}
         />

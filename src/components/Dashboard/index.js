@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -20,7 +19,6 @@ import CardContent from '@material-ui/core/CardContent';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Box from '@material-ui/core/Box';
-import PropTypes from 'prop-types';
 import CardActions from '@material-ui/core/CardActions';
 import { CardHeader, Divider } from '@material-ui/core';
 import { ChromePicker } from 'react-color';
@@ -63,43 +61,32 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function TabPanel(props) {
-  const {
-    children, tabValue, index, ...other
-  } = props;
+const TabPanel = ({ children, tabValue, index, ...other }) => (
+  <Typography
+    component="div"
+    role="tabpanel"
+    hidden={tabValue !== index}
+    id={`simple-tabpanel-${index}`}
+    aria-labelledby={`simple-tab-${index}`}
+    {...other}
+  >
+    {tabValue === index && <Box p={3}>{children}</Box>}
+  </Typography>
+);
 
-  return (
-    <Typography
-      component="div"
-      role="tabpanel"
-      hidden={tabValue !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {tabValue === index && <Box p={3}>{children}</Box>}
-    </Typography>
-  );
-}
-
-TabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.any.isRequired,
-  tabValue: PropTypes.any.isRequired,
-};
-
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
+const a11yProps = (index) => ({
+  id: `simple-tab-${index}`,
+  'aria-controls': `simple-tabpanel-${index}`,
+});
 
 export default function Dashboard() {
   const classes = useStyles();
   const history = useHistory();
+  const query = new URLSearchParams(history.location.search);
+  const token = query.get('token');
+  const location = query.get('location');
 
-  if (!history.location.state) history.push('');
+  if (!(token && location)) history.push('');
 
   const [state] = useState({
     checkedA: true,
@@ -107,7 +94,7 @@ export default function Dashboard() {
     ctValue: 1200,
     tabValue: 0,
     selectedDevice: new NanoleafClient(
-      new URL(history.location.state.location).hostname, history.location.state.token,
+      new URL(location).hostname, token,
     ),
   });
 
@@ -121,13 +108,13 @@ export default function Dashboard() {
   const [tabValue, setTabValue] = useState(0);
   const [colorValue, setColorValue] = useState('#ff0000');
 
-  const getNanoleafInfo = () => state.selectedDevice.getInfo().then(response => response);
-
   useEffect(() => {
-    getNanoleafInfo().then(response => {
-      setValue(response.state.brightness.value);
-      setCtValue(response.state.ct.value);
-      setpanelLayout(response.panelLayout.layout);
+    state.selectedDevice.getInfo().then(response => {
+      if (response.state) {
+        setValue(response.state.brightness.value);
+        setCtValue(response.state.ct.value);
+        setpanelLayout(response.panelLayout.layout);
+      }
     });
   }, []);
 
@@ -158,7 +145,6 @@ export default function Dashboard() {
   return (
 
     <div className={classes.root}>
-      <CssBaseline />
       <AppBar
         position="fixed"
         className={classes.appBar}
