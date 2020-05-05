@@ -52,6 +52,7 @@
     "@testing-library/user-event": "^7.2.1",
     "axios": "^0.19.2",
     "clsx": "^1.1.0",
+    "color-convert": "2.0.1",
     "concurrently": "^5.0.2",
     "electron-is-dev": "^1.1.0",
     "electron-osx-sign": "^0.4.15",

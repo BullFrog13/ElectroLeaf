@@ -16,14 +16,12 @@ import AppsIcon from '@material-ui/icons/Apps';
 import Slider from '@material-ui/core/Slider';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Box from '@material-ui/core/Box';
 import CardActions from '@material-ui/core/CardActions';
 import { CardHeader, Divider } from '@material-ui/core';
 import { ChromePicker } from 'react-color';
 import { NanoleafClient } from 'nanoleaf-client';
 import NanoleafLayout from 'nanoleaf-layout/lib/NanoleafLayout';
+import convert from 'color-convert';
 
 const drawerWidth = 240;
 
@@ -61,24 +59,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const TabPanel = ({ children, tabValue, index, ...other }) => (
-  <Typography
-    component="div"
-    role="tabpanel"
-    hidden={tabValue !== index}
-    id={`simple-tabpanel-${index}`}
-    aria-labelledby={`simple-tab-${index}`}
-    {...other}
-  >
-    {tabValue === index && <Box p={3}>{children}</Box>}
-  </Typography>
-);
-
-const a11yProps = (index) => ({
-  id: `simple-tab-${index}`,
-  'aria-controls': `simple-tabpanel-${index}`,
-});
-
 export default function Dashboard() {
   const classes = useStyles();
   const history = useHistory();
@@ -100,7 +80,7 @@ export default function Dashboard() {
       sideLength: 0,
       positionData: [],
     },
-    color: '#ff0000',
+    color: '',
   });
 
   useEffect(() => {
@@ -111,14 +91,15 @@ export default function Dashboard() {
           brightness: response.state.brightness.value,
           ctValue: response.state.ct.value,
           layout: response.panelLayout.layout,
+          color: convert.hsv.hex([
+            response.state.hue.value,
+            response.state.sat.value,
+            response.state.brightness.value,
+          ]),
         });
       }
     });
   }, []);
-
-  const changeTabs = (_event, tabValue) => {
-    setState({ ...state, tabValue });
-  };
 
   const updateDeviceBrightness = (_event, brightness) => {
     state.nanoleafClient.setBrightness(brightness);
@@ -136,7 +117,11 @@ export default function Dashboard() {
     setState({ ...state, ctValue });
   };
 
-  const updateColor = (color) => {
+  const updateColorCommited = color => {
+    state.nanoleafClient.setHexColor(color.hex);
+  };
+
+  const updateColor = color => {
     setState({ ...state, color });
   };
 
@@ -189,30 +174,13 @@ export default function Dashboard() {
             </Grid>
             <Grid item xs={12} md={6} lg={6}>
               <Card>
-                <Tabs
-                  value={state.tabValue}
-                  onChange={changeTabs}
-                  aria-label="simple tabs example"
-                  centered
-                >
-                  <Tab label="RGB" {...a11yProps(0)} />
-                  <Tab label="Hex" {...a11yProps(1)} />
-                  <Tab label="HSL" {...a11yProps(2)} />
-                </Tabs>
                 <CardContent className={classes.colorCard}>
-                  <TabPanel tabValue={state.tabValue} index={0}>
-                    <ChromePicker
-                      disableAlpha
-                      onChange={updateColor}
-                      color={state.color}
-                    />
-                  </TabPanel>
-                  <TabPanel tabValue={state.tabValue} index={1}>
-                    Item Two
-                  </TabPanel>
-                  <TabPanel tabValue={state.tabValue} index={2}>
-                    Item Three
-                  </TabPanel>
+                  <ChromePicker
+                    disableAlpha
+                    onChange={updateColor}
+                    onChangeComplete={updateColorCommited}
+                    color={state.color}
+                  />
                 </CardContent>
               </Card>
             </Grid>
