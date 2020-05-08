@@ -15,15 +15,14 @@ import { useHistory } from 'react-router-dom';
 import AppsIcon from '@material-ui/icons/Apps';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
-import { CardHeader, Divider } from '@material-ui/core';
 import { ChromePicker } from 'react-color';
 import { NanoleafClient } from 'nanoleaf-client';
 import NanoleafLayout from 'nanoleaf-layout/lib/NanoleafLayout';
 import convert from 'color-convert';
-import ThemeCard from './ThemeCard';
+import ModeCard from './ModeCard';
 import BrightnessCard from './BrightnessCard';
 import ColorTemperatureCard from './ColorTemperatureCard';
+import StatusCard from './StatusCard';
 
 const drawerWidth = 240;
 
@@ -72,10 +71,8 @@ export default function Dashboard() {
   if (!(token && location)) history.push('');
 
   const [state, setState] = useState({
-    checkedA: true,
     brightness: 30,
     ctValue: 1200,
-    tabValue: 0,
     nanoleafClient: new NanoleafClient(new URL(location).hostname, token),
     layout: {
       numPanels: 0,
@@ -85,16 +82,21 @@ export default function Dashboard() {
     color: '',
     effectList: [],
     selectedEffect: '',
+    colorMode: ''
   });
 
   useEffect(() => {
-    const getInfoPromise = state.nanoleafClient.getInfo();
-    const getEffectListPromise = state.nanoleafClient.getEffectList();
-    const getEffectPromise = state.nanoleafClient.getEffect();
-    Promise.all([getInfoPromise, getEffectListPromise, getEffectPromise]).then(responses => {
+    const {nanoleafClient} = state;
+    const getInfoPromise = nanoleafClient.getInfo();
+    const getEffectListPromise = nanoleafClient.getEffectList();
+    const getEffectPromise = nanoleafClient.getEffect();
+    const getColorMode = nanoleafClient.getColorMode();
+
+    Promise.all([getInfoPromise, getEffectListPromise, getEffectPromise, getColorMode]).then(responses => {
       const deviceInfo = responses[0];
       const effectList = responses[1];
       const effect = responses[2];
+      const colorMode = responses[3];
 
       if (deviceInfo.state) {
         setState({
@@ -107,8 +109,9 @@ export default function Dashboard() {
             deviceInfo.state.sat.value,
             deviceInfo.state.brightness.value,
           ]),
-          effectList: effectList,
+          effectList,
           selectedEffect: (effect === '*Solid*') ? '' : effect,
+          colorMode
         });
       }
     });
@@ -207,36 +210,15 @@ export default function Dashboard() {
           <Grid container spacing={3}>
             <Grid item xs={12} md={3} lg={3}>
               <BrightnessCard brightness={state.brightness} updateDeviceBrightness={updateDeviceBrightness} updateBrightnessValue={updateBrightnessValue}/>
-              </Grid>
+            </Grid>
             <Grid item xs={12} md={3} lg={3}>
               <ColorTemperatureCard ctValue={state.ctValue} updateDeviceCt={updateDeviceCt} updateCtValue={updateCtValue}/>
-              </Grid>
+            </Grid>
             <Grid item xs={12} md={3} lg={3}>
-                      {
-              <ThemeCard selectedEffect={state.selectedEffect} effectList={state.effectList} selectEffect={selectEffect} />
-              </Grid>
+              <ModeCard selectedEffect={state.selectedEffect} effectList={state.effectList} selectEffect={selectEffect} colorMode={state.colorMode}/>
+            </Grid>
             <Grid item xs={12} md={3} lg={3}>
-              <Card>
-                <CardHeader
-                  title="Status"
-                  titleTypographyProps={{ variant: 'h6' }}
-                />
-                <CardContent>
-                  <Typography
-                    className={classes.title}
-                    color="textSecondary"
-                    gutterBottom
-                  >
-                    Word of the Day
-                  </Typography>
-                </CardContent>
-                <Divider />
-                <CardActions className={classes.alignCenter}>
-                  <Typography align="center" variant="h6" color="textSecondary">
-                    OK
-                  </Typography>
-                </CardActions>
-              </Card>
+              <StatusCard/>
             </Grid>
           </Grid>
         </Container>

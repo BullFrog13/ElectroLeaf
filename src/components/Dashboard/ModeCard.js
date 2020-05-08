@@ -21,13 +21,27 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function ThemeCard({ selectedEffect, effectList, selectEffect }) {
+const mapColorMode = (colorMode) => {
+  switch (colorMode) {
+    case 'effect':
+      return 'Theme';
+    case 'hs':
+      return 'Hue/Saturation';
+    case 'ct':
+      return 'Color temperature mode';
+    default:
+      return '';
+  }
+};
+
+export default function ModeCard({ selectedEffect, effectList, selectEffect, colorMode }) {
   const classes = useStyles();
+  const mappedColorMode = mapColorMode(colorMode);
 
   return (
     <Card>
       <CardHeader
-        title="Theme"
+        title="Color Mode"
         titleTypographyProps={{ variant: 'h6' }}
       />
       <CardContent>
@@ -52,7 +66,7 @@ export default function ThemeCard({ selectedEffect, effectList, selectEffect }) 
       <Divider />
       <CardActions className={classes.alignCenter}>
         <Typography align="center" variant="h6" color="textSecondary">
-          Pink
+          {mappedColorMode}
         </Typography>
       </CardActions>
     </Card>
