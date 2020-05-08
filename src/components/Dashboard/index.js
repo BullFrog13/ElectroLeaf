@@ -21,6 +21,10 @@ import { CardHeader, Divider } from '@material-ui/core';
 import { ChromePicker } from 'react-color';
 import { NanoleafClient } from 'nanoleaf-client';
 import NanoleafLayout from 'nanoleaf-layout/lib/NanoleafLayout';
+import InputLabel from '@material-ui/core/InputLabel';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 import convert from 'color-convert';
 
 const drawerWidth = 240;
@@ -57,6 +61,10 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     display: 'inline',
   },
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
 }));
 
 export default function Dashboard() {
@@ -81,24 +89,39 @@ export default function Dashboard() {
       positionData: [],
     },
     color: '',
+    effectList: [],
+    selectedEffect: '',
   });
 
   useEffect(() => {
-    state.nanoleafClient.getInfo().then(response => {
-      if (response.state) {
+    const getInfoPromise = state.nanoleafClient.getInfo();
+    const getEffectListPromise = state.nanoleafClient.getEffectList();
+    const getEffectPromise = state.nanoleafClient.getEffect();
+    Promise.all([getInfoPromise, getEffectListPromise, getEffectPromise]).then(responses => {
+      const deviceInfo = responses[0];
+      const effectList = responses[1];
+      const effect = responses[2];
+
+      if (deviceInfo.state) {
         setState({
           ...state,
-          brightness: response.state.brightness.value,
-          ctValue: response.state.ct.value,
-          layout: response.panelLayout.layout,
+          brightness: deviceInfo.state.brightness.value,
+          ctValue: deviceInfo.state.ct.value,
+          layout: deviceInfo.panelLayout.layout,
           color: convert.hsv.hex([
-            response.state.hue.value,
-            response.state.sat.value,
-            response.state.brightness.value,
+            deviceInfo.state.hue.value,
+            deviceInfo.state.sat.value,
+            deviceInfo.state.brightness.value,
           ]),
+          effectList: effectList,
+          selectedEffect: (effect === '*Solid*') ? '' : effect,
         });
       }
     });
+
+    state.nanoleafClient.getColorMode().then((r) => { console.log(r); });
+    state.nanoleafClient.getEffect().then((r) => { console.log(r); });
+    // state.nanoleafClient.getEffectList().then((r) => { console.log(r); });
   }, []);
 
   const updateDeviceBrightness = (_event, brightness) => {
@@ -117,12 +140,18 @@ export default function Dashboard() {
     setState({ ...state, ctValue });
   };
 
-  const updateColorCommited = color => {
+  const updateDeviceColor = color => {
     state.nanoleafClient.setHexColor(color.hex);
   };
 
   const updateColor = color => {
     setState({ ...state, color });
+  };
+
+  const selectEffect = (event) => {
+    const { value } = event.target;
+    state.nanoleafClient.setEffect(value);
+    setState({ ...state, selectedEffect: value });
   };
 
   return (
@@ -178,7 +207,7 @@ export default function Dashboard() {
                   <ChromePicker
                     disableAlpha
                     onChange={updateColor}
-                    onChangeComplete={updateColorCommited}
+                    onChangeComplete={updateDeviceColor}
                     color={state.color}
                   />
                 </CardContent>
@@ -247,13 +276,23 @@ export default function Dashboard() {
                   titleTypographyProps={{ variant: 'h6' }}
                 />
                 <CardContent>
-                  <Typography
-                    className={classes.title}
-                    color="textSecondary"
-                    gutterBottom
-                  >
-                    Word of the Day
-                  </Typography>
+                  <FormControl variant="outlined" className={classes.formControl}>
+                    <InputLabel htmlFor="outlined-theme-label">Theme</InputLabel>
+                    <Select
+                      labelId="outlined-theme-label"
+                      id="outlined-theme"
+                      value={state.selectedEffect}
+                      onChange={selectEffect}
+                      label="Theme"
+                    >
+                      <MenuItem value=""><em> </em></MenuItem>
+                      {
+                        state.effectList.map(effect => (
+                          <MenuItem key={effect} value={effect}>{effect}</MenuItem>
+                        ))
+                      }
+                    </Select>
+                  </FormControl>
                 </CardContent>
                 <Divider />
                 <CardActions className={classes.alignCenter}>
