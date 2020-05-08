@@ -13,7 +13,6 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ChangeHistoryIcon from '@material-ui/icons/ChangeHistory';
 import { useHistory } from 'react-router-dom';
 import AppsIcon from '@material-ui/icons/Apps';
-import Slider from '@material-ui/core/Slider';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
@@ -21,11 +20,10 @@ import { CardHeader, Divider } from '@material-ui/core';
 import { ChromePicker } from 'react-color';
 import { NanoleafClient } from 'nanoleaf-client';
 import NanoleafLayout from 'nanoleaf-layout/lib/NanoleafLayout';
-import InputLabel from '@material-ui/core/InputLabel';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
 import convert from 'color-convert';
+import ThemeCard from './ThemeCard';
+import BrightnessCard from './BrightnessCard';
+import ColorTemperatureCard from './ColorTemperatureCard';
 
 const drawerWidth = 240;
 
@@ -60,10 +58,6 @@ const useStyles = makeStyles((theme) => ({
   alignCenter: {
     alignItems: 'center',
     display: 'inline',
-  },
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: 120,
   },
 }));
 
@@ -118,10 +112,6 @@ export default function Dashboard() {
         });
       }
     });
-
-    state.nanoleafClient.getColorMode().then((r) => { console.log(r); });
-    state.nanoleafClient.getEffect().then((r) => { console.log(r); });
-    // state.nanoleafClient.getEffectList().then((r) => { console.log(r); });
   }, []);
 
   const updateDeviceBrightness = (_event, brightness) => {
@@ -216,92 +206,15 @@ export default function Dashboard() {
           </Grid>
           <Grid container spacing={3}>
             <Grid item xs={12} md={3} lg={3}>
-              <Card>
-                <CardHeader
-                  title="Brightness"
-                  titleTypographyProps={{ variant: 'h6' }}
-                />
-                <CardContent>
-                  <Slider
-                    value={state.brightness}
-                    onChangeCommitted={updateDeviceBrightness}
-                    onChange={updateBrightnessValue}
-                    aria-labelledby="continuous-slider"
-                    marks={[
-                      { value: 0, label: '0' },
-                      { value: 100, label: '100' },
-                    ]}
-                  />
-                </CardContent>
-                <Divider />
-                <CardActions className={classes.alignCenter}>
-                  <Typography align="center" variant="h6" color="textSecondary">
-                    {state.brightness}
-                  </Typography>
-                </CardActions>
-              </Card>
-            </Grid>
+              <BrightnessCard brightness={state.brightness} updateDeviceBrightness={updateDeviceBrightness} updateBrightnessValue={updateBrightnessValue}/>
+              </Grid>
             <Grid item xs={12} md={3} lg={3}>
-              <Card>
-                <CardHeader
-                  title="Color Temperature"
-                  titleTypographyProps={{ variant: 'h6' }}
-                />
-                <CardContent>
-                  <Slider
-                    value={state.ctValue}
-                    onChangeCommitted={updateDeviceCt}
-                    onChange={updateCtValue}
-                    aria-labelledby="continuous-slider"
-                    min={1200}
-                    max={6500}
-                    marks={[
-                      { value: 1200, label: '1200' },
-                      { value: 6500, label: '6500' },
-                    ]}
-                  />
-                </CardContent>
-                <Divider />
-                <CardActions className={classes.alignCenter}>
-                  <Typography align="center" variant="h6" color="textSecondary">
-                    {state.ctValue}
-                  </Typography>
-                </CardActions>
-              </Card>
-            </Grid>
+              <ColorTemperatureCard ctValue={state.ctValue} updateDeviceCt={updateDeviceCt} updateCtValue={updateCtValue}/>
+              </Grid>
             <Grid item xs={12} md={3} lg={3}>
-              <Card>
-                <CardHeader
-                  title="Theme"
-                  titleTypographyProps={{ variant: 'h6' }}
-                />
-                <CardContent>
-                  <FormControl variant="outlined" className={classes.formControl}>
-                    <InputLabel htmlFor="outlined-theme-label">Theme</InputLabel>
-                    <Select
-                      labelId="outlined-theme-label"
-                      id="outlined-theme"
-                      value={state.selectedEffect}
-                      onChange={selectEffect}
-                      label="Theme"
-                    >
-                      <MenuItem value=""><em> </em></MenuItem>
                       {
-                        state.effectList.map(effect => (
-                          <MenuItem key={effect} value={effect}>{effect}</MenuItem>
-                        ))
-                      }
-                    </Select>
-                  </FormControl>
-                </CardContent>
-                <Divider />
-                <CardActions className={classes.alignCenter}>
-                  <Typography align="center" variant="h6" color="textSecondary">
-                    Pink
-                  </Typography>
-                </CardActions>
-              </Card>
-            </Grid>
+              <ThemeCard selectedEffect={state.selectedEffect} effectList={state.effectList} selectEffect={selectEffect} />
+              </Grid>
             <Grid item xs={12} md={3} lg={3}>
               <Card>
                 <CardHeader
