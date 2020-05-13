@@ -13,7 +13,6 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ChangeHistoryIcon from '@material-ui/icons/ChangeHistory';
 import { useHistory } from 'react-router-dom';
 import AppsIcon from '@material-ui/icons/Apps';
-import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import { ChromePicker } from 'react-color';
 import { NanoleafClient } from 'nanoleaf-client';
@@ -23,6 +22,7 @@ import ModeCard from './ModeCard';
 import BrightnessCard from './BrightnessCard';
 import ColorTemperatureCard from './ColorTemperatureCard';
 import StatusCard from './StatusCard';
+import CardWrapper from './CardWrapper';
 
 const drawerWidth = 240;
 
@@ -82,11 +82,11 @@ export default function Dashboard() {
     color: '',
     effectList: [],
     selectedEffect: '',
-    colorMode: ''
+    colorMode: '',
   });
 
   useEffect(() => {
-    const {nanoleafClient} = state;
+    const { nanoleafClient } = state;
     const getInfoPromise = nanoleafClient.getInfo();
     const getEffectListPromise = nanoleafClient.getEffectList();
     const getEffectPromise = nanoleafClient.getEffect();
@@ -111,7 +111,7 @@ export default function Dashboard() {
           ]),
           effectList,
           selectedEffect: (effect === '*Solid*') ? '' : effect,
-          colorMode
+          colorMode,
         });
       }
     });
@@ -190,12 +190,10 @@ export default function Dashboard() {
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={6}>
-              <Card>
-                <NanoleafLayout data={state.layout} svgStyle={{ height: '400px' }} />
-              </Card>
+              <CardWrapper wrappedComponent={<NanoleafLayout data={state.layout} svgStyle={{ height: '400px' }} />} />
             </Grid>
             <Grid item xs={12} md={6} lg={6}>
-              <Card>
+              <CardWrapper wrappedComponent={(
                 <CardContent className={classes.colorCard}>
                   <ChromePicker
                     disableAlpha
@@ -204,21 +202,35 @@ export default function Dashboard() {
                     color={state.color}
                   />
                 </CardContent>
-              </Card>
+                )}
+              />
             </Grid>
           </Grid>
           <Grid container spacing={3}>
             <Grid item xs={12} md={3} lg={3}>
-              <BrightnessCard brightness={state.brightness} updateDeviceBrightness={updateDeviceBrightness} updateBrightnessValue={updateBrightnessValue}/>
+              <BrightnessCard
+                brightness={state.brightness}
+                updateDeviceBrightness={updateDeviceBrightness}
+                updateBrightnessValue={updateBrightnessValue}
+              />
             </Grid>
             <Grid item xs={12} md={3} lg={3}>
-              <ColorTemperatureCard ctValue={state.ctValue} updateDeviceCt={updateDeviceCt} updateCtValue={updateCtValue}/>
+              <ColorTemperatureCard
+                ctValue={state.ctValue}
+                updateDeviceCt={updateDeviceCt}
+                updateCtValue={updateCtValue}
+              />
             </Grid>
             <Grid item xs={12} md={3} lg={3}>
-              <ModeCard selectedEffect={state.selectedEffect} effectList={state.effectList} selectEffect={selectEffect} colorMode={state.colorMode}/>
+              <ModeCard
+                selectedEffect={state.selectedEffect}
+                effectList={state.effectList}
+                selectEffect={selectEffect}
+                colorMode={state.colorMode}
+              />
             </Grid>
             <Grid item xs={12} md={3} lg={3}>
-              <StatusCard/>
+              <StatusCard />
             </Grid>
           </Grid>
         </Container>
