@@ -3,12 +3,13 @@ import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
-import { CardHeader, Divider } from '@material-ui/core';
+import { CardHeader } from '@material-ui/core';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import CardWrapper from './CardWrapper';
+import CardDivider from './CardDivider';
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -64,9 +65,9 @@ export default function ModeCard({ selectedEffect, effectList, selectEffect, col
             </Select>
           </FormControl>
         </CardContent>
-        <Divider />
+        <CardDivider />
         <CardActions className={classes.alignCenter}>
-          <Typography align="center" variant="h6" color="textSecondary">
+          <Typography align="center" variant="subtitle1">
             {mappedColorMode}
           </Typography>
         </CardActions>

@@ -23,6 +23,7 @@ import BrightnessCard from './BrightnessCard';
 import ColorTemperatureCard from './ColorTemperatureCard';
 import StatusCard from './StatusCard';
 import CardWrapper from './CardWrapper';
+import CardDivider from './CardDivider';
 
 const drawerWidth = 240;
 
@@ -177,12 +178,14 @@ export default function Dashboard() {
             </ListItemIcon>
             <ListItemText primary="General" />
           </ListItem>
+          <CardDivider />
           <ListItem button>
             <ListItemIcon>
               <ChangeHistoryIcon color="secondary" />
             </ListItemIcon>
             <ListItemText primary="Devices" />
           </ListItem>
+          <CardDivider />
         </List>
       </Drawer>
       <main className={classes.content}>

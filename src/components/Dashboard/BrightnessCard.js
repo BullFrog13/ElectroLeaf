@@ -3,9 +3,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
-import { CardHeader, Divider } from '@material-ui/core';
+import { CardHeader } from '@material-ui/core';
 import Slider from '@material-ui/core/Slider';
 import CardWrapper from './CardWrapper';
+import CardDivider from './CardDivider';
 
 
 const useStyles = makeStyles(() => ({
@@ -36,13 +37,18 @@ export default function BrightnessCard({
             aria-labelledby="continuous-slider"
             marks={[
               { value: 0, label: '0' },
+              { value: 20, label: '20' },
+              { value: 40, label: '40' },
+              { value: 60, label: '60' },
+              { value: 80, label: '80' },
               { value: 100, label: '100' },
             ]}
+            color="secondary"
           />
         </CardContent>
-        <Divider />
+        <CardDivider />
         <CardActions className={classes.alignCenter}>
-          <Typography align="center" variant="h6" color="textSecondary">
+          <Typography align="center" variant="subtitle1">
             {brightness}
           </Typography>
         </CardActions>
