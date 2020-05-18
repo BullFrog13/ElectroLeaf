@@ -6,6 +6,7 @@ const useStyles = makeStyles((theme) => ({
   card: {
     backgroundColor: theme.palette.secondary.contrastText,
     color: theme.palette.common.white,
+    height: '100%',
   },
 }));
 

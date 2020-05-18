@@ -18,12 +18,14 @@ import { ChromePicker } from 'react-color';
 import { NanoleafClient } from 'nanoleaf-client';
 import NanoleafLayout from 'nanoleaf-layout/lib/NanoleafLayout';
 import convert from 'color-convert';
+import { CardHeader } from '@material-ui/core';
 import ModeCard from './ModeCard';
 import BrightnessCard from './BrightnessCard';
 import ColorTemperatureCard from './ColorTemperatureCard';
 import StatusCard from './StatusCard';
 import CardWrapper from './CardWrapper';
 import CardDivider from './CardDivider';
+
 
 const drawerWidth = 240;
 
@@ -193,18 +195,33 @@ export default function Dashboard() {
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={6}>
-              <CardWrapper wrappedComponent={<NanoleafLayout data={state.layout} svgStyle={{ height: '400px' }} />} />
+              <CardWrapper wrappedComponent={(
+                <div>
+                  <CardHeader
+                    title="Position"
+                    titleTypographyProps={{ variant: 'h6' }}
+                  />
+                  <NanoleafLayout data={state.layout} svgStyle={{ height: '300px' }} />
+                </div>
+                )}
+              />
             </Grid>
             <Grid item xs={12} md={6} lg={6}>
               <CardWrapper wrappedComponent={(
-                <CardContent className={classes.colorCard}>
-                  <ChromePicker
-                    disableAlpha
-                    onChange={updateColor}
-                    onChangeComplete={updateDeviceColor}
-                    color={state.color}
+                <div>
+                  <CardHeader
+                    title="Color"
+                    titleTypographyProps={{ variant: 'h6' }}
                   />
-                </CardContent>
+                  <CardContent className={classes.colorCard}>
+                    <ChromePicker
+                      disableAlpha
+                      onChange={updateColor}
+                      onChangeComplete={updateDeviceColor}
+                      color={state.color}
+                    />
+                  </CardContent>
+                </div>
                 )}
               />
             </Grid>
