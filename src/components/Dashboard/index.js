@@ -18,16 +18,16 @@ import { ChromePicker } from 'react-color';
 import { NanoleafClient } from 'nanoleaf-client';
 import NanoleafLayout from 'nanoleaf-layout/lib/NanoleafLayout';
 import convert from 'color-convert';
-import { CardHeader } from '@material-ui/core';
+import ColorLensIcon from '@material-ui/icons/ColorLens';
+import Chip from '@material-ui/core/Chip';
 import ModeCard from './ModeCard';
 import BrightnessCard from './BrightnessCard';
 import ColorTemperatureCard from './ColorTemperatureCard';
-import StatusCard from './StatusCard';
 import CardWrapper from './CardWrapper';
 import CardDivider from './CardDivider';
 
 
-const drawerWidth = 240;
+const drawerWidth = 180;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -60,6 +60,13 @@ const useStyles = makeStyles((theme) => ({
   alignCenter: {
     alignItems: 'center',
     display: 'inline',
+  },
+  chip: {
+    marginBottom: theme.spacing(4),
+  },
+  colorPicker: {
+    width: '100%',
+    background: 'none',
   },
 }));
 
@@ -129,7 +136,7 @@ export default function Dashboard() {
   };
 
   const updateDeviceCt = (_event, ctValue) => {
-    state.nanoleafClient.setColorTemperature(ctValue);
+    state.nanoleafClient.setColorTemperature((ctValue * 53) + 1200);
   };
 
   const updateCtValue = (_event, ctValue) => {
@@ -195,30 +202,26 @@ export default function Dashboard() {
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={6}>
-              <CardWrapper wrappedComponent={(
-                <div>
-                  <CardHeader
-                    title="Position"
-                    titleTypographyProps={{ variant: 'h6' }}
-                  />
-                  <NanoleafLayout data={state.layout} svgStyle={{ height: '300px' }} />
-                </div>
-                )}
-              />
+              <NanoleafLayout data={state.layout} svgStyle={{ height: '400px' }} />
             </Grid>
             <Grid item xs={12} md={6} lg={6}>
               <CardWrapper wrappedComponent={(
                 <div>
-                  <CardHeader
-                    title="Color"
-                    titleTypographyProps={{ variant: 'h6' }}
-                  />
                   <CardContent className={classes.colorCard}>
+                    <Chip
+                      icon={<ColorLensIcon />}
+                      label="Color Temperature"
+                      color="secondary"
+                      className={classes.chip}
+                    />
                     <ChromePicker
                       disableAlpha
                       onChange={updateColor}
                       onChangeComplete={updateDeviceColor}
                       color={state.color}
+                      width="100%"
+                      background="none"
+                      styles={classes.colorPicker}
                     />
                   </CardContent>
                 </div>
@@ -241,7 +244,7 @@ export default function Dashboard() {
                 updateCtValue={updateCtValue}
               />
             </Grid>
-            <Grid item xs={12} md={3} lg={3}>
+            <Grid item xs={12} md={6} lg={6}>
               <ModeCard
                 selectedEffect={state.selectedEffect}
                 effectList={state.effectList}
@@ -249,9 +252,7 @@ export default function Dashboard() {
                 colorMode={state.colorMode}
               />
             </Grid>
-            <Grid item xs={12} md={3} lg={3}>
-              <StatusCard />
-            </Grid>
+            <Grid item xs={12} md={3} lg={3} />
           </Grid>
         </Container>
       </main>

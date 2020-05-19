@@ -3,11 +3,12 @@ import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
-import { CardHeader } from '@material-ui/core';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
+import InvertColorsIcon from '@material-ui/icons/InvertColors';
+import Chip from '@material-ui/core/Chip';
 import CardWrapper from './CardWrapper';
 import CardDivider from './CardDivider';
 
@@ -16,9 +17,8 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(1),
     minWidth: 120,
   },
-  alignCenter: {
-    alignItems: 'center',
-    display: 'inline',
+  chip: {
+    marginBottom: theme.spacing(8),
   },
 }));
 
@@ -42,11 +42,13 @@ export default function ModeCard({ selectedEffect, effectList, selectEffect, col
   return (
     <CardWrapper wrappedComponent={(
       <div>
-        <CardHeader
-          title="Color Mode"
-          titleTypographyProps={{ variant: 'h6' }}
-        />
         <CardContent>
+          <Chip
+            icon={<InvertColorsIcon />}
+            label="Color Mode"
+            color="secondary"
+            className={classes.chip}
+          />
           <FormControl variant="outlined" className={classes.formControl}>
             <InputLabel htmlFor="outlined-theme-label">Theme</InputLabel>
             <Select

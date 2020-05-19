@@ -1,18 +1,15 @@
 import React, { } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
 import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
-import { CardHeader } from '@material-ui/core';
+import Brightness7Icon from '@material-ui/icons/Brightness7';
 import Slider from '@material-ui/core/Slider';
+import Chip from '@material-ui/core/Chip';
 import CardWrapper from './CardWrapper';
-import CardDivider from './CardDivider';
 
 
-const useStyles = makeStyles(() => ({
-  alignCenter: {
-    alignItems: 'center',
-    display: 'inline',
+const useStyles = makeStyles((theme) => ({
+  chip: {
+    marginBottom: theme.spacing(8),
   },
 }));
 
@@ -25,15 +22,18 @@ export default function BrightnessCard({
   return (
     <CardWrapper wrappedComponent={(
       <div>
-        <CardHeader
-          title="Brightness"
-          titleTypographyProps={{ variant: 'h6' }}
-        />
         <CardContent>
+          <Chip
+            icon={<Brightness7Icon />}
+            label="Brightness"
+            color="secondary"
+            className={classes.chip}
+          />
           <Slider
             value={brightness}
             onChangeCommitted={updateDeviceBrightness}
             onChange={updateBrightnessValue}
+            valueLabelDisplay="on"
             aria-labelledby="continuous-slider"
             marks={[
               { value: 0, label: '0' },
@@ -46,12 +46,6 @@ export default function BrightnessCard({
             color="secondary"
           />
         </CardContent>
-        <CardDivider />
-        <CardActions className={classes.alignCenter}>
-          <Typography align="center" variant="subtitle1">
-            {brightness}
-          </Typography>
-        </CardActions>
       </div>
     )}
     />
