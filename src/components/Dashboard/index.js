@@ -230,14 +230,14 @@ export default function Dashboard() {
             </Grid>
           </Grid>
           <Grid container spacing={3}>
-            <Grid item xs={12} md={3} lg={3}>
+            <Grid item xs={12} sm={6} md={3} lg={3}>
               <BrightnessCard
                 brightness={state.brightness}
                 updateDeviceBrightness={updateDeviceBrightness}
                 updateBrightnessValue={updateBrightnessValue}
               />
             </Grid>
-            <Grid item xs={12} md={3} lg={3}>
+            <Grid item xs={12} sm={6} md={3} lg={3}>
               <ColorTemperatureCard
                 ctValue={state.ctValue}
                 updateDeviceCt={updateDeviceCt}

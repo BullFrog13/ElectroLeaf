@@ -16,10 +16,13 @@ const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
     minWidth: 120,
+    display: 'flex',
+    flexDirection: 'column',
   },
   chip: {
-    marginBottom: theme.spacing(8),
+    marginBottom: theme.spacing(2),
   },
+
 }));
 
 const mapColorMode = (colorMode) => {
