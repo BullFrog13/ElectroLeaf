@@ -17,12 +17,17 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(1),
     minWidth: 120,
     display: 'flex',
-    flexDirection: 'column',
   },
   chip: {
     marginBottom: theme.spacing(2),
   },
-
+  dropdownLabel: {
+    color: 'black',
+  },
+  dropdownSelect: {
+    color: theme.palette.common.white,
+    backgroundColor: 'rgba(190, 190, 190, 0.4)',
+  },
 }));
 
 const mapColorMode = (colorMode) => {
@@ -53,10 +58,11 @@ export default function ModeCard({ selectedEffect, effectList, selectEffect, col
             className={classes.chip}
           />
           <FormControl variant="outlined" className={classes.formControl}>
-            <InputLabel htmlFor="outlined-theme-label">Theme</InputLabel>
+            <InputLabel className={classes.dropdownLabel} htmlFor="outlined-theme-label">Theme</InputLabel>
             <Select
               labelId="outlined-theme-label"
               id="outlined-theme"
+              className={classes.dropdownSelect}
               value={selectedEffect}
               onChange={selectEffect}
               label="Theme"
