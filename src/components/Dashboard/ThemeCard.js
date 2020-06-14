@@ -1,16 +1,13 @@
 import React, { } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
 import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
-import InvertColorsIcon from '@material-ui/icons/InvertColors';
+import ControlCameraIcon from '@material-ui/icons/ControlCamera';
 import Chip from '@material-ui/core/Chip';
 import CardWrapper from './CardWrapper';
-import CardDivider from './CardDivider';
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -19,41 +16,27 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
   },
   chip: {
-    marginBottom: theme.spacing(2),
+    marginBottom: theme.spacing(6),
   },
   dropdownLabel: {
-    color: 'black',
+    color: theme.palette.common.white,
   },
   dropdownSelect: {
     color: theme.palette.common.white,
-    backgroundColor: 'rgba(190, 190, 190, 0.4)',
+    backgroundColor: 'rgba(190, 190, 190, 0.2)',
   },
 }));
 
-const mapColorMode = (colorMode) => {
-  switch (colorMode) {
-    case 'effect':
-      return 'Theme';
-    case 'hs':
-      return 'Hue/Saturation';
-    case 'ct':
-      return 'Color temperature mode';
-    default:
-      return '';
-  }
-};
-
-export default function ModeCard({ selectedEffect, effectList, selectEffect, colorMode }) {
+export default function ThemeCard({ selectedEffect, effectList, selectEffect }) {
   const classes = useStyles();
-  const mappedColorMode = mapColorMode(colorMode);
 
   return (
     <CardWrapper wrappedComponent={(
       <div>
         <CardContent>
           <Chip
-            icon={<InvertColorsIcon />}
-            label="Color Mode"
+            icon={<ControlCameraIcon />}
+            label="Theme"
             color="secondary"
             className={classes.chip}
           />
@@ -76,12 +59,6 @@ export default function ModeCard({ selectedEffect, effectList, selectEffect, col
             </Select>
           </FormControl>
         </CardContent>
-        <CardDivider />
-        <CardActions className={classes.alignCenter}>
-          <Typography align="center" variant="subtitle1">
-            {mappedColorMode}
-          </Typography>
-        </CardActions>
       </div>
     )}
     />

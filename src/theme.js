@@ -25,6 +25,19 @@ const theme = createMuiTheme({
       blueGradient: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
     },
   },
+  overrides: {
+    MuiSlider: {
+      thumb: {
+        // color: 'yellow',
+      },
+      markLabel: {
+        color: 'rgba(255, 255, 255, 0.7)',
+      },
+      markLabelActive: {
+        color: 'white',
+      },
+    },
+  },
 });
 
 export default theme;

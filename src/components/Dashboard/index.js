@@ -20,14 +20,15 @@ import NanoleafLayout from 'nanoleaf-layout/lib/NanoleafLayout';
 import convert from 'color-convert';
 import ColorLensIcon from '@material-ui/icons/ColorLens';
 import Chip from '@material-ui/core/Chip';
-import ModeCard from './ModeCard';
+import ThemeCard from './ThemeCard';
 import BrightnessCard from './BrightnessCard';
 import ColorTemperatureCard from './ColorTemperatureCard';
 import CardWrapper from './CardWrapper';
 import CardDivider from './CardDivider';
+import ActiveModeCard from './ActiveModeCard';
 
 
-const drawerWidth = 180;
+const drawerWidth = 160;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -200,7 +201,7 @@ export default function Dashboard() {
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
-          <Grid container spacing={3}>
+          <Grid container spacing={2}>
             <Grid item xs={12} md={6} lg={6}>
               <NanoleafLayout data={state.layout} svgStyle={{ height: '400px' }} />
             </Grid>
@@ -210,7 +211,7 @@ export default function Dashboard() {
                   <CardContent className={classes.colorCard}>
                     <Chip
                       icon={<ColorLensIcon />}
-                      label="Color Temperature"
+                      label="Color"
                       color="secondary"
                       className={classes.chip}
                     />
@@ -229,7 +230,7 @@ export default function Dashboard() {
               />
             </Grid>
           </Grid>
-          <Grid container spacing={3}>
+          <Grid container spacing={2}>
             <Grid item xs={12} sm={6} md={3} lg={3}>
               <BrightnessCard
                 brightness={state.brightness}
@@ -244,11 +245,15 @@ export default function Dashboard() {
                 updateCtValue={updateCtValue}
               />
             </Grid>
-            <Grid item xs={12} md={6} lg={6}>
-              <ModeCard
+            <Grid item xs={12} sm={6} md={3} lg={3}>
+              <ThemeCard
                 selectedEffect={state.selectedEffect}
                 effectList={state.effectList}
                 selectEffect={selectEffect}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3} lg={3}>
+              <ActiveModeCard
                 colorMode={state.colorMode}
               />
             </Grid>
