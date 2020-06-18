@@ -1,25 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Drawer from '@material-ui/core/Drawer';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
-import Typography from '@material-ui/core/Typography';
-import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
+import { Drawer,
+  Chip,
+  AppBar,
+  Toolbar,
+  List,
+  Typography,
+  Container,
+  Grid,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  CardContent } from '@material-ui/core';
 import ChangeHistoryIcon from '@material-ui/icons/ChangeHistory';
+import ColorLensIcon from '@material-ui/icons/ColorLens';
 import { useHistory } from 'react-router-dom';
 import AppsIcon from '@material-ui/icons/Apps';
-import CardContent from '@material-ui/core/CardContent';
 import { ChromePicker } from 'react-color';
 import { NanoleafClient } from 'nanoleaf-client';
 import NanoleafLayout from 'nanoleaf-layout/lib/NanoleafLayout';
 import convert from 'color-convert';
-import ColorLensIcon from '@material-ui/icons/ColorLens';
-import Chip from '@material-ui/core/Chip';
 import ThemeCard from './ThemeCard';
 import BrightnessCard from './BrightnessCard';
 import ColorTemperatureCard from './ColorTemperatureCard';

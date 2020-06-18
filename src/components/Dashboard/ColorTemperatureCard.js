@@ -1,9 +1,7 @@
 import React, { } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import CardContent from '@material-ui/core/CardContent';
+import { CardContent, Chip, Slider } from '@material-ui/core';
 import OpacityIcon from '@material-ui/icons/Opacity';
-import Chip from '@material-ui/core/Chip';
-import Slider from '@material-ui/core/Slider';
 import CardWrapper from './CardWrapper';
 
 const useStyles = makeStyles((theme) => ({

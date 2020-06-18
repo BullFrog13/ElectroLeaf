@@ -1,9 +1,7 @@
 import React, { } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import CardContent from '@material-ui/core/CardContent';
+import { CardContent, Slider, Chip } from '@material-ui/core';
 import Brightness7Icon from '@material-ui/icons/Brightness7';
-import Slider from '@material-ui/core/Slider';
-import Chip from '@material-ui/core/Chip';
 import CardWrapper from './CardWrapper';
 
 
