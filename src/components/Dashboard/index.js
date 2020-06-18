@@ -89,36 +89,45 @@ export default function Dashboard() {
     colorMode: '',
   });
 
-  useEffect(() => {
+  const getAndUpdateState = () => {
     const { nanoleafClient } = state;
     const getInfoPromise = nanoleafClient.getInfo();
     const getEffectListPromise = nanoleafClient.getEffectList();
     const getEffectPromise = nanoleafClient.getEffect();
     const getColorMode = nanoleafClient.getColorMode();
 
-    Promise.all([getInfoPromise, getEffectListPromise, getEffectPromise, getColorMode]).then(responses => {
-      const deviceInfo = responses[0];
-      const effectList = responses[1];
-      const effect = responses[2];
-      const colorMode = responses[3];
+    Promise.all([getInfoPromise, getEffectListPromise, getEffectPromise, getColorMode])
+      .then(responses => {
+        const deviceInfo = responses[0];
+        const effectList = responses[1];
+        const effect = responses[2];
+        const colorMode = responses[3];
 
-      if (deviceInfo.state) {
-        setState({
-          ...state,
-          brightness: deviceInfo.state.brightness.value,
-          ctValue: deviceInfo.state.ct.value,
-          layout: deviceInfo.panelLayout.layout,
-          color: convert.hsv.hex([
-            deviceInfo.state.hue.value,
-            deviceInfo.state.sat.value,
-            deviceInfo.state.brightness.value,
-          ]),
-          effectList,
-          selectedEffect: (effect === '*Solid*') ? '' : effect,
-          colorMode,
-        });
-      }
-    });
+        if (deviceInfo.state) {
+          setState({
+            ...state,
+            brightness: deviceInfo.state.brightness.value,
+            ctValue: (deviceInfo.state.ct.value - 1200) / 53,
+            layout: deviceInfo.panelLayout.layout,
+            color: convert.hsv.hex([
+              deviceInfo.state.hue.value,
+              deviceInfo.state.sat.value,
+              deviceInfo.state.brightness.value,
+            ]),
+            effectList,
+            selectedEffect: (effect === '*Solid*') ? '' : effect,
+            colorMode,
+          });
+        }
+      });
+  };
+
+  useEffect(() => {
+    getAndUpdateState();
+    const interval = setInterval(() => {
+      getAndUpdateState();
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const updateDeviceBrightness = (_event, brightness) => {
