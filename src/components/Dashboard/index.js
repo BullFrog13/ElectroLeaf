@@ -51,17 +51,10 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
   },
-  media: {
-    height: 240,
-  },
   colorCard: {
     height: 300,
   },
   toolbar: theme.mixins.toolbar,
-  alignCenter: {
-    alignItems: 'center',
-    display: 'inline',
-  },
   chip: {
     marginBottom: theme.spacing(4),
   },

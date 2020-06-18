@@ -10,6 +10,9 @@ const useStyles = makeStyles((theme) => ({
   chip: {
     marginBottom: theme.spacing(8),
   },
+  slider: {
+    width: '96%',
+  },
 }));
 
 export default function ColorTemperatureCard({
@@ -32,6 +35,7 @@ export default function ColorTemperatureCard({
             value={ctValue}
             onChangeCommitted={updateDeviceCt}
             onChange={updateCtValue}
+            className={classes.slider}
             aria-labelledby="continuous-slider"
             valueLabelDisplay="on"
             min={0}

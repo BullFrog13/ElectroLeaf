@@ -11,6 +11,9 @@ const useStyles = makeStyles((theme) => ({
   chip: {
     marginBottom: theme.spacing(8),
   },
+  slider: {
+    width: '96%',
+  },
 }));
 
 export default function BrightnessCard({
@@ -33,6 +36,7 @@ export default function BrightnessCard({
             value={brightness}
             onChangeCommitted={updateDeviceBrightness}
             onChange={updateBrightnessValue}
+            className={classes.slider}
             valueLabelDisplay="on"
             aria-labelledby="continuous-slider"
             marks={[
