@@ -58,10 +58,6 @@ const useStyles = makeStyles((theme) => ({
   chip: {
     marginBottom: theme.spacing(4),
   },
-  colorPicker: {
-    width: '100%',
-    background: 'none',
-  },
 }));
 
 export default function Dashboard() {
@@ -122,6 +118,14 @@ export default function Dashboard() {
       });
   };
 
+  const updateColorMode = () => {
+    const { nanoleafClient } = state;
+
+    nanoleafClient.getColorMode().then(colorMode => {
+      setState({ ...state, colorMode });
+    });
+  };
+
   useEffect(() => {
     getAndUpdateState();
     const interval = setInterval(() => {
@@ -131,7 +135,8 @@ export default function Dashboard() {
   }, []);
 
   const updateDeviceBrightness = (_event, brightness) => {
-    state.nanoleafClient.setBrightness(brightness);
+    state.nanoleafClient.setBrightness(brightness)
+      .then(() => { updateColorMode(); });
   };
 
   const updateBrightnessValue = (_event, brightness) => {
@@ -139,7 +144,8 @@ export default function Dashboard() {
   };
 
   const updateDeviceCt = (_event, ctValue) => {
-    state.nanoleafClient.setColorTemperature((ctValue * 53) + 1200);
+    state.nanoleafClient.setColorTemperature((ctValue * 53) + 1200)
+      .then(() => { updateColorMode(); });
   };
 
   const updateCtValue = (_event, ctValue) => {
@@ -147,7 +153,8 @@ export default function Dashboard() {
   };
 
   const updateDeviceColor = color => {
-    state.nanoleafClient.setHexColor(color.hex);
+    state.nanoleafClient.setHexColor(color.hex)
+      .then(() => { updateColorMode(); });
   };
 
   const updateColor = color => {
@@ -156,7 +163,8 @@ export default function Dashboard() {
 
   const selectEffect = (event) => {
     const { value } = event.target;
-    state.nanoleafClient.setEffect(value);
+    state.nanoleafClient.setEffect(value)
+      .then(() => { updateColorMode(); });
     setState({ ...state, selectedEffect: value });
   };
 
@@ -224,7 +232,6 @@ export default function Dashboard() {
                       color={state.color}
                       width="100%"
                       background="none"
-                      styles={classes.colorPicker}
                     />
                   </CardContent>
                 </div>
