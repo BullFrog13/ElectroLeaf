@@ -52,13 +52,26 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(3),
   },
   colorCard: {
-    height: 300,
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
   },
   toolbar: theme.mixins.toolbar,
   chip: {
     marginBottom: theme.spacing(4),
   },
+  colorChip: {
+    width: 'fit-content',
+    marginBottom: theme.spacing(4),
+  },
 }));
+
+const colorPickerStyles = {
+  background: 'none',
+  boxShadow: 'none',
+  margin: '0 -16px',
+  width: 'auto',
+};
 
 export default function Dashboard() {
   const classes = useStyles();
@@ -212,29 +225,26 @@ export default function Dashboard() {
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={2}>
-            <Grid item xs={12} md={6} lg={6}>
-              <NanoleafLayout data={state.layout} svgStyle={{ height: '400px' }} />
+            <Grid item xs={6} md={6} lg={6}>
+              <NanoleafLayout data={state.layout} svgStyle={{ height: '60vh', maxHeight: '400px', margin: '-15px 0' }} />
             </Grid>
-            <Grid item xs={12} md={6} lg={6}>
+            <Grid item xs={6} md={6} lg={6}>
               <CardWrapper wrappedComponent={(
-                <div>
-                  <CardContent className={classes.colorCard}>
-                    <Chip
-                      icon={<ColorLensIcon />}
-                      label="Color"
-                      color="secondary"
-                      className={classes.chip}
-                    />
-                    <ChromePicker
-                      disableAlpha
-                      onChange={updateColor}
-                      onChangeComplete={updateDeviceColor}
-                      color={state.color}
-                      width="100%"
-                      background="none"
-                    />
-                  </CardContent>
-                </div>
+                <CardContent className={classes.colorCard}>
+                  <Chip
+                    icon={<ColorLensIcon />}
+                    label="Color"
+                    color="secondary"
+                    className={classes.colorChip}
+                  />
+                  <ChromePicker
+                    disableAlpha
+                    onChange={updateColor}
+                    onChangeComplete={updateDeviceColor}
+                    color={state.color}
+                    styles={{ default: { picker: colorPickerStyles } }}
+                  />
+                </CardContent>
                 )}
               />
             </Grid>
