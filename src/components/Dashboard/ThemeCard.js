@@ -7,6 +7,7 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import ControlCameraIcon from '@material-ui/icons/ControlCamera';
 import Chip from '@material-ui/core/Chip';
+import classNames from 'classnames';
 import CardWrapper from './CardWrapper';
 
 const useStyles = makeStyles((theme) => ({
@@ -18,6 +19,9 @@ const useStyles = makeStyles((theme) => ({
   chip: {
     marginBottom: theme.spacing(6),
   },
+  greyBg: {
+    background: theme.palette.neutral.main
+  },
   dropdownLabel: {
     color: theme.palette.common.white,
   },
@@ -27,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function ThemeCard({ selectedEffect, effectList, selectEffect }) {
+export default function ThemeCard({ selectedEffect, effectList, selectEffect, isModeEnabled }) {
   const classes = useStyles();
 
   return (
@@ -38,7 +42,7 @@ export default function ThemeCard({ selectedEffect, effectList, selectEffect }) 
             icon={<ControlCameraIcon />}
             label="Theme"
             color="secondary"
-            className={classes.chip}
+            className={classNames(classes.chip, isModeEnabled ? '' : classes.greyBg)}
           />
           <FormControl variant="outlined" className={classes.formControl}>
             <InputLabel className={classes.dropdownLabel} htmlFor="outlined-theme-label">Theme</InputLabel>
