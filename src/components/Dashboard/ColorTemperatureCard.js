@@ -2,6 +2,7 @@ import React, { } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { CardContent, Chip, Slider } from '@material-ui/core';
 import OpacityIcon from '@material-ui/icons/Opacity';
+import classNames from 'classnames';
 import CardWrapper from './CardWrapper';
 
 const useStyles = makeStyles((theme) => ({
@@ -11,12 +12,16 @@ const useStyles = makeStyles((theme) => ({
   slider: {
     width: '96%',
   },
+  greyBg: {
+    background: theme.palette.neutral.main
+  },
 }));
 
 export default function ColorTemperatureCard({
   ctValue,
   updateDeviceCt,
-  updateCtValue }) {
+  updateCtValue,
+  isModeEnabled }) {
   const classes = useStyles();
 
   return (
@@ -27,7 +32,7 @@ export default function ColorTemperatureCard({
             icon={<OpacityIcon />}
             label="Color Temperature"
             color="secondary"
-            className={classes.chip}
+            className={classNames(classes.chip, isModeEnabled ? '' : classes.greyBg)}
           />
           <Slider
             value={ctValue}

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Drawer,
-  Chip,
   AppBar,
   Toolbar,
   List,
@@ -11,22 +10,19 @@ import { Drawer,
   ListItem,
   ListItemText,
   ListItemIcon,
-  CardContent,
   Switch } from '@material-ui/core';
 import ChangeHistoryIcon from '@material-ui/icons/ChangeHistory';
-import ColorLensIcon from '@material-ui/icons/ColorLens';
 import { useHistory } from 'react-router-dom';
 import AppsIcon from '@material-ui/icons/Apps';
-import { ChromePicker } from 'react-color';
 import { NanoleafClient } from 'nanoleaf-client';
 import NanoleafLayout from 'nanoleaf-layout/lib/NanoleafLayout';
 import convert from 'color-convert';
 import ThemeCard from './ThemeCard';
 import BrightnessCard from './BrightnessCard';
 import ColorTemperatureCard from './ColorTemperatureCard';
-import CardWrapper from './CardWrapper';
 import CardDivider from './CardDivider';
 import ActiveModeCard from './ActiveModeCard';
+import ColorCard from './ColorCard';
 
 
 const drawerWidth = 160;
@@ -55,27 +51,9 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
   },
-  colorCard: {
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-  },
   toolbar: theme.mixins.toolbar,
-  chip: {
-    marginBottom: theme.spacing(4),
-  },
-  colorChip: {
-    width: 'fit-content',
-    marginBottom: theme.spacing(4),
-  },
 }));
 
-const colorPickerStyles = {
-  background: 'none',
-  boxShadow: 'none',
-  margin: '0 -16px',
-  width: 'auto',
-};
 
 export default function Dashboard() {
   const classes = useStyles();
@@ -253,23 +231,11 @@ export default function Dashboard() {
               <NanoleafLayout data={state.layout} svgStyle={{ height: '60vh', maxHeight: '400px', margin: '-15px 0' }} />
             </Grid>
             <Grid item xs={6} md={6} lg={6}>
-              <CardWrapper wrappedComponent={(
-                <CardContent className={classes.colorCard}>
-                  <Chip
-                    icon={<ColorLensIcon />}
-                    label="Color"
-                    color="secondary"
-                    className={classes.colorChip}
-                  />
-                  <ChromePicker
-                    disableAlpha
-                    onChange={updateColor}
-                    onChangeComplete={updateDeviceColor}
-                    color={state.color}
-                    styles={{ default: { picker: colorPickerStyles } }}
-                  />
-                </CardContent>
-                )}
+              <ColorCard
+                color={state.color}
+                updateDeviceColor={updateDeviceColor}
+                updateColor={updateColor}
+                isModeEnabled={state.colorMode === 'hs'}
               />
             </Grid>
           </Grid>
@@ -286,6 +252,7 @@ export default function Dashboard() {
                 ctValue={state.ctValue}
                 updateDeviceCt={updateDeviceCt}
                 updateCtValue={updateCtValue}
+                isModeEnabled={state.colorMode === 'ct'}
               />
             </Grid>
             <Grid item xs={12} sm={6} md={3} lg={3}>
@@ -293,6 +260,7 @@ export default function Dashboard() {
                 selectedEffect={state.selectedEffect}
                 effectList={state.effectList}
                 selectEffect={selectEffect}
+                isModeEnabled={state.colorMode === 'effect'}
               />
             </Grid>
             <Grid item xs={12} sm={6} md={3} lg={3}>
