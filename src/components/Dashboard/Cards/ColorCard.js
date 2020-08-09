@@ -4,7 +4,7 @@ import { CardContent, Chip } from '@material-ui/core';
 import ColorLensIcon from '@material-ui/icons/ColorLens';
 import { ChromePicker } from 'react-color';
 import classNames from 'classnames';
-import CardWrapper from './CardWrapper';
+import CardWrapper from '../CardWrapper';
 
 const useStyles = makeStyles((theme) => ({
   colorCard: {
@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(4),
   },
   greyBg: {
-    background: theme.palette.neutral.main
+    background: theme.palette.neutral.main,
   },
 }));
 
@@ -38,20 +38,20 @@ export default function ColorCard({
   return (
     <CardWrapper wrappedComponent={(
       <CardContent className={classes.colorCard}>
-      <Chip
-        icon={<ColorLensIcon />}
-        label="Color"
-        color="secondary"
-        className={classNames(classes.chip, isModeEnabled ? '' : classes.greyBg)}
-      />
-      <ChromePicker
-        disableAlpha
-        onChange={updateColor}
-        onChangeComplete={updateDeviceColor}
-        color={color}
-        styles={{ default: { picker: colorPickerStyles } }}
-      />
-    </CardContent>
+        <Chip
+          icon={<ColorLensIcon />}
+          label="Color"
+          color="secondary"
+          className={classNames(classes.chip, isModeEnabled ? '' : classes.greyBg)}
+        />
+        <ChromePicker
+          disableAlpha
+          onChange={updateColor}
+          onChangeComplete={updateDeviceColor}
+          color={color}
+          styles={{ default: { picker: colorPickerStyles } }}
+        />
+      </CardContent>
     )}
     />
   );

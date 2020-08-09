@@ -2,7 +2,7 @@ import React, { } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import BrokenImageIcon from '@material-ui/icons/BrokenImage';
 import { Button, ButtonGroup, CardContent, Chip } from '@material-ui/core';
-import CardWrapper from './CardWrapper';
+import CardWrapper from '../CardWrapper';
 
 
 const useStyles = makeStyles((theme) => ({

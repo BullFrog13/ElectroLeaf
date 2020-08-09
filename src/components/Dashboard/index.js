@@ -16,12 +16,13 @@ import AppsIcon from '@material-ui/icons/Apps';
 import { NanoleafClient } from 'nanoleaf-client';
 import NanoleafLayout from 'nanoleaf-layout/lib/NanoleafLayout';
 import convert from 'color-convert';
-import ThemeCard from './ThemeCard';
-import BrightnessCard from './BrightnessCard';
-import ColorTemperatureCard from './ColorTemperatureCard';
+import ThemeCard from './Cards/ThemeCard';
+import BrightnessCard from './Cards/BrightnessCard';
+import ColorTemperatureCard from './Cards/ColorTemperatureCard';
+import ActiveModeCard from './Cards/ActiveModeCard';
+import ColorCard from './Cards/ColorCard';
 import CardDivider from './CardDivider';
-import ActiveModeCard from './ActiveModeCard';
-import ColorCard from './ColorCard';
+import NoConnectionDialog from './NoConnectionDialog';
 
 
 const drawerWidth = 160;
@@ -51,7 +52,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-
 export default function Dashboard() {
   const classes = useStyles();
   const history = useHistory();
@@ -75,39 +75,44 @@ export default function Dashboard() {
     effectList: [],
     selectedEffect: '',
     colorMode: '',
+    openConnectionDialog: false,
   });
 
   const getAndUpdateState = () => {
-    const { nanoleafClient } = state;
-    const getInfoPromise = nanoleafClient.getInfo();
-    const getEffectListPromise = nanoleafClient.getEffectList();
-    const getEffectPromise = nanoleafClient.getEffect();
-    const getColorMode = nanoleafClient.getColorMode();
+    if (navigator.onLine) {
+      const { nanoleafClient } = state;
+      const getInfoPromise = nanoleafClient.getInfo();
+      const getEffectListPromise = nanoleafClient.getEffectList();
+      const getEffectPromise = nanoleafClient.getEffect();
+      const getColorMode = nanoleafClient.getColorMode();
 
-    Promise.all([getInfoPromise, getEffectListPromise, getEffectPromise, getColorMode])
-      .then(responses => {
-        const deviceInfo = responses[0];
-        const effectList = responses[1];
-        const effect = responses[2];
-        const colorMode = responses[3];
+      Promise.all([getInfoPromise, getEffectListPromise, getEffectPromise, getColorMode])
+        .then(responses => {
+          const deviceInfo = responses[0];
+          const effectList = responses[1];
+          const effect = responses[2];
+          const colorMode = responses[3];
 
-        if (deviceInfo.state) {
-          setState({
-            ...state,
-            brightness: deviceInfo.state.brightness.value,
-            ctValue: (deviceInfo.state.ct.value - 1200) / 53,
-            layout: deviceInfo.panelLayout.layout,
-            color: convert.hsv.hex([
-              deviceInfo.state.hue.value,
-              deviceInfo.state.sat.value,
-              deviceInfo.state.brightness.value,
-            ]),
-            effectList,
-            selectedEffect: (effect === '*Solid*') ? '' : effect,
-            colorMode,
-          });
-        }
-      });
+          if (deviceInfo.state) {
+            setState({
+              ...state,
+              brightness: deviceInfo.state.brightness.value,
+              ctValue: (deviceInfo.state.ct.value - 1200) / 53,
+              layout: deviceInfo.panelLayout.layout,
+              color: convert.hsv.hex([
+                deviceInfo.state.hue.value,
+                deviceInfo.state.sat.value,
+                deviceInfo.state.brightness.value,
+              ]),
+              effectList,
+              selectedEffect: (effect === '*Solid*') ? '' : effect,
+              colorMode,
+            });
+          }
+        });
+    } else if (!state.openConnectionDialog) {
+      setState({ ...state, openConnectionDialog: true });
+    }
   };
 
   const updateColorMode = () => {
@@ -160,6 +165,10 @@ export default function Dashboard() {
     setState({ ...state, selectedEffect: value });
   };
 
+  const closeConnectionDialog = () => {
+    setState({ ...state, openConnectionDialog: false });
+  };
+
   return (
     <div className={classes.root}>
       <AppBar
@@ -208,12 +217,12 @@ export default function Dashboard() {
               <NanoleafLayout data={state.layout} svgStyle={{ height: '60vh', maxHeight: '400px', margin: '-15px 0' }} />
             </Grid>
             <Grid item xs={6} md={6} lg={6}>
-              <ColorCard 
+              <ColorCard
                 color={state.color}
                 updateDeviceColor={updateDeviceColor}
                 updateColor={updateColor}
                 isModeEnabled={state.colorMode === 'hs'}
-                />
+              />
             </Grid>
           </Grid>
           <Grid container spacing={2}>
@@ -249,6 +258,13 @@ export default function Dashboard() {
           </Grid>
         </Container>
       </main>
+      <NoConnectionDialog
+        open={state.openConnectionDialog}
+        closeDialog={closeConnectionDialog}
+        maxWidth="sm"
+        fullWidth
+        keepMounted
+      />
     </div>
   );
 }

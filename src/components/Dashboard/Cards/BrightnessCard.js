@@ -1,9 +1,9 @@
 import React, { } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { CardContent, Chip, Slider } from '@material-ui/core';
-import OpacityIcon from '@material-ui/icons/Opacity';
-import classNames from 'classnames';
-import CardWrapper from './CardWrapper';
+import { CardContent, Slider, Chip } from '@material-ui/core';
+import Brightness7Icon from '@material-ui/icons/Brightness7';
+import CardWrapper from '../CardWrapper';
+
 
 const useStyles = makeStyles((theme) => ({
   chip: {
@@ -12,16 +12,12 @@ const useStyles = makeStyles((theme) => ({
   slider: {
     width: '96%',
   },
-  greyBg: {
-    background: theme.palette.neutral.main
-  },
 }));
 
-export default function ColorTemperatureCard({
-  ctValue,
-  updateDeviceCt,
-  updateCtValue,
-  isModeEnabled }) {
+export default function BrightnessCard({
+  brightness,
+  updateDeviceBrightness,
+  updateBrightnessValue }) {
   const classes = useStyles();
 
   return (
@@ -29,20 +25,18 @@ export default function ColorTemperatureCard({
       <div>
         <CardContent>
           <Chip
-            icon={<OpacityIcon />}
-            label="Color Temperature"
+            icon={<Brightness7Icon />}
+            label="Brightness"
             color="secondary"
-            className={classNames(classes.chip, isModeEnabled ? '' : classes.greyBg)}
+            className={classes.chip}
           />
           <Slider
-            value={ctValue}
-            onChangeCommitted={updateDeviceCt}
-            onChange={updateCtValue}
+            value={brightness}
+            onChangeCommitted={updateDeviceBrightness}
+            onChange={updateBrightnessValue}
             className={classes.slider}
-            aria-labelledby="continuous-slider"
             valueLabelDisplay="on"
-            min={0}
-            max={100}
+            aria-labelledby="continuous-slider"
             marks={[
               { value: 0, label: '0' },
               { value: 20, label: '20' },

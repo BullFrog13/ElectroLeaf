@@ -8,7 +8,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import ControlCameraIcon from '@material-ui/icons/ControlCamera';
 import Chip from '@material-ui/core/Chip';
 import classNames from 'classnames';
-import CardWrapper from './CardWrapper';
+import CardWrapper from '../CardWrapper';
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(6),
   },
   greyBg: {
-    background: theme.palette.neutral.main
+    background: theme.palette.neutral.main,
   },
   dropdownLabel: {
     color: theme.palette.common.white,

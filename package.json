@@ -58,7 +58,7 @@
     "electron-is-dev": "^1.1.0",
     "electron-osx-sign": "^0.4.15",
     "material-ui-color-picker": "^3.5.0",
-    "nanoleaf-client": "^0.1.4",
+    "nanoleaf-client": "^0.1.5",
     "nanoleaf-layout": "^3.0.3",
     "react": "^16.12.0",
     "react-color": "2.18.0",
