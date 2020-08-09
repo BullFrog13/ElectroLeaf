@@ -70,15 +70,16 @@ export default function DeviceDetector() {
     selectedDevice: {},
     activeStep: 0,
     configDevices: [],
+    noDevicesFoundFlag: false,
   });
 
   const isForceDetectNew = (history.location.state)
     ? history.location.state.isForceDetectNew : false;
 
-  const goToDashboard = (location, token) => {
+  const goToDashboard = (location, token, uuid) => {
     history.push({
       pathname: '/dashboard',
-      search: `?location=${location}&token=${token}`,
+      search: `?location=${location}&token=${token}&uuid=${uuid}`,
     });
   };
 
@@ -89,7 +90,7 @@ export default function DeviceDetector() {
       );
 
       if (selectedConfigDevice && (typeof selectedConfigDevice.token) === 'string') {
-        goToDashboard(selectedConfigDevice.location, selectedConfigDevice.token);
+        goToDashboard(selectedConfigDevice.location, selectedConfigDevice.token, selectedConfigDevice.deviceId);
       }
     });
   };
@@ -99,6 +100,12 @@ export default function DeviceDetector() {
   const discover = () => {
     setState({ ...state, isDiscoverRunning: true });
     axios.get('http://localhost:3001/discover').then((res) => {
+      if (res.data.length === 0) {
+        setState({ ...state, noDevicesFoundFlag: true });
+
+        return;
+      }
+
       const devices = res.data.filter(
         (device, index, self) => index === self.findIndex(t => t.uuid === device.uuid),
       );
@@ -107,6 +114,7 @@ export default function DeviceDetector() {
         ...state,
         devices,
         isDiscoverRunning: false,
+        noDevicesFoundFlag: false,
         activeStep: state.activeStep + 1,
       });
     });
@@ -125,7 +133,7 @@ export default function DeviceDetector() {
 
     client.authorize().then(token => {
       updateConfig(state.devices).then(() => {
-        goToDashboard(state.selectedDevice.location, token);
+        goToDashboard(state.selectedDevice.location, token, state.selectedDevice.deviceId);
       });
     });
   };
@@ -138,6 +146,11 @@ export default function DeviceDetector() {
         </Grid>
         {state.activeStep === 0 && (
           <Grid item className={classes.grid} xs={4}>
+            {
+              state.noDevicesFoundFlag && (
+              <Typography className={classes.title}>Device not found</Typography>
+              )
+            }
             <Button
               type="submit"
               fullWidth
@@ -146,7 +159,7 @@ export default function DeviceDetector() {
               className={classes.submit}
               onClick={discover}
             >
-              Discover
+              { state.noDevicesFoundFlag ? 'Retry Discovery 2' : 'Discover Devices' }
             </Button>
             {
               state.isDiscoverRunning && <LinearProgress className={classes.loadingBar} variant="query" color="secondary" />

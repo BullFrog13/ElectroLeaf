@@ -22,11 +22,11 @@ export default function StepTwo({ handleSelectDevice, devices }) {
   const classes = useStyles();
 
   return (
-    <Grid item className={classes.grid} xs={4}>
+    <Grid item xs={4}>
       <Typography variant="h6" className={classes.whiteText}>
         Discovered Devices
       </Typography>
-      <div className={classes.demo}>
+      <div>
         <List>
           {devices.map((device) => (
             <ListItem
