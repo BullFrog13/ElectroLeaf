@@ -11,7 +11,8 @@ import { Drawer,
   ListItem,
   ListItemText,
   ListItemIcon,
-  CardContent } from '@material-ui/core';
+  CardContent,
+  Switch } from '@material-ui/core';
 import ChangeHistoryIcon from '@material-ui/icons/ChangeHistory';
 import ColorLensIcon from '@material-ui/icons/ColorLens';
 import { useHistory } from 'react-router-dom';
@@ -36,6 +37,9 @@ const useStyles = makeStyles((theme) => ({
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
+  },
+  title: {
+    flexGrow: 1,
   },
   appBarSpacer: theme.mixins.toolbar,
   drawer: {
@@ -80,10 +84,12 @@ export default function Dashboard() {
   const query = new URLSearchParams(history.location.search);
   const token = query.get('token');
   const location = query.get('location');
+  // const deviceId = query.get('deviceId');
 
   if (!(token && location)) history.push('');
 
   const [state, setState] = useState({
+    power: false,
     brightness: 30,
     ctValue: 1200,
     nanoleafClient: new NanoleafClient(new URL(location).hostname, token),
@@ -115,6 +121,7 @@ export default function Dashboard() {
         if (deviceInfo.state) {
           setState({
             ...state,
+            power: deviceInfo.state.on.value,
             brightness: deviceInfo.state.brightness.value,
             ctValue: (deviceInfo.state.ct.value - 1200) / 53,
             layout: deviceInfo.panelLayout.layout,
@@ -152,6 +159,10 @@ export default function Dashboard() {
       .then(() => { updateColorMode(); });
   };
 
+  const updatePower = power => {
+    setState({ ...state, power });
+  };
+
   const updateBrightnessValue = (_event, brightness) => {
     setState({ ...state, brightness });
   };
@@ -181,19 +192,32 @@ export default function Dashboard() {
     setState({ ...state, selectedEffect: value });
   };
 
+  const switchPower = (event) => {
+    const { checked } = event.target;
+
+    if (checked === true) {
+      state.nanoleafClient.turnOn()
+        .then(() => { updatePower(checked); });
+    } else if (checked === false) {
+      state.nanoleafClient.turnOff()
+        .then(() => { updatePower(checked); });
+    }
+  };
+
   return (
     <div className={classes.root}>
       <AppBar
         position="fixed"
         className={classes.appBar}
-        onClick={() => {
-          history.push('/', { isForceDetectNew: true });
-        }}
       >
         <Toolbar>
-          <Typography variant="h6" noWrap>
+          <Typography variant="h6" noWrap className={classes.title}>
             ElectroLeaf
           </Typography>
+          <Typography variant="h6" noWrap>
+            Power
+          </Typography>
+          <Switch checked={state.power} inputProps={{ 'aria-label': 'secondary checkbox' }} onChange={switchPower} />
         </Toolbar>
       </AppBar>
       <Drawer
