@@ -88,16 +88,10 @@ export default function Dashboard() {
     if (navigator.onLine) {
       const { nanoleafClient } = state;
       const getInfoPromise = nanoleafClient.getInfo();
-      const getEffectListPromise = nanoleafClient.getEffectList();
-      const getEffectPromise = nanoleafClient.getEffect();
-      const getColorMode = nanoleafClient.getColorMode();
 
-      Promise.all([getInfoPromise, getEffectListPromise, getEffectPromise, getColorMode])
+      Promise.all([getInfoPromise])
         .then(responses => {
           const deviceInfo = responses[0];
-          const effectList = responses[1];
-          const effect = responses[2];
-          const colorMode = responses[3];
 
           if (deviceInfo.state) {
             setState({
@@ -111,9 +105,9 @@ export default function Dashboard() {
                 deviceInfo.state.sat.value,
                 deviceInfo.state.brightness.value,
               ]),
-              effectList,
-              selectedEffect: (effect === '*Solid*') ? '' : effect,
-              colorMode,
+              effectList: deviceInfo.effects.effectsList,
+              selectedEffect: (deviceInfo.effects.select === '*Solid*') ? '' : deviceInfo.effects.select,
+              colorMode: deviceInfo.state.colorMode,
             });
           }
         });
@@ -201,11 +195,18 @@ export default function Dashboard() {
         <Toolbar>
           <Typography variant="h6" noWrap className={classes.title}>
             ElectroLeaf
+            <Switch checked={state.power} inputProps={{ 'aria-label': 'secondary checkbox' }} onChange={switchPower} />
           </Typography>
-          <Typography variant="h6" noWrap>
-            Power
+
+          <Typography
+            variant="h6"
+            noWrap
+            onClick={() => {
+              history.push('/', { isForceDetectNew: true });
+            }}
+          >
+            To Device Discovery
           </Typography>
-          <Switch checked={state.power} inputProps={{ 'aria-label': 'secondary checkbox' }} onChange={switchPower} />
         </Toolbar>
       </AppBar>
       <Drawer
