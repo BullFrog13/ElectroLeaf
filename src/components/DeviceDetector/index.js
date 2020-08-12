@@ -37,6 +37,9 @@ const useStyles = makeStyles((theme) => ({
   whiteText: {
     color: theme.palette.primary.contrastText,
   },
+  redText: {
+    color: theme.palette.error.main,
+  },
   ipTextField: {
     marginTop: theme.spacing(2),
     width: '100%',
@@ -71,6 +74,7 @@ export default function DeviceDetector() {
     activeStep: 0,
     configDevices: [],
     noDevicesFoundFlag: false,
+    authorizationFailed: false,
   });
 
   const isForceDetectNew = (history.location.state)
@@ -135,6 +139,11 @@ export default function DeviceDetector() {
       updateConfig(state.devices).then(() => {
         goToDashboard(state.selectedDevice.location, token, state.selectedDevice.deviceId);
       });
+    }, () => {
+      setState({
+        ...state,
+        authorizationFailed: true,
+      });
     });
   };
 
@@ -159,7 +168,7 @@ export default function DeviceDetector() {
               className={classes.submit}
               onClick={discover}
             >
-              { state.noDevicesFoundFlag ? 'Retry Discovery 2' : 'Discover Devices' }
+              { state.noDevicesFoundFlag ? 'Retry Discovery' : 'Discover Devices' }
             </Button>
             {
               state.isDiscoverRunning && <LinearProgress className={classes.loadingBar} variant="query" color="secondary" />
@@ -172,7 +181,7 @@ export default function DeviceDetector() {
         {state.activeStep === 2 && (
           <Grid item className={classes.grid} xs={4}>
             <Typography className={classes.whiteText}>
-              Hold the on-off button down for 5-7 seconds until the LED starts flashing in a pattern.
+              Hold the on/off button for 5-7 seconds until the white LED starts flashing in a pattern, then authorize.
             </Typography>
             <Button
               type="submit"
@@ -184,6 +193,13 @@ export default function DeviceDetector() {
             >
               Authorize
             </Button>
+
+            { state.authorizationFailed && (
+            <Typography className={classes.redText}>
+              Authorization failed. Make sure the white LED is blinking.
+            </Typography>
+            )}
+
           </Grid>
         )}
       </Grid>
