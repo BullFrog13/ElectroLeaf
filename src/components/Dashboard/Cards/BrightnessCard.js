@@ -4,7 +4,6 @@ import { CardContent, Slider, Chip } from '@material-ui/core';
 import Brightness7Icon from '@material-ui/icons/Brightness7';
 import CardWrapper from '../CardWrapper';
 
-
 const useStyles = makeStyles((theme) => ({
   chip: {
     marginBottom: theme.spacing(8),

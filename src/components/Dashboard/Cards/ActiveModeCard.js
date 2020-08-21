@@ -4,7 +4,6 @@ import BrokenImageIcon from '@material-ui/icons/BrokenImage';
 import { Button, ButtonGroup, CardContent, Chip } from '@material-ui/core';
 import CardWrapper from '../CardWrapper';
 
-
 const useStyles = makeStyles((theme) => ({
   chip: {
     marginBottom: theme.spacing(2),
