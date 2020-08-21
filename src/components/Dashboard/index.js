@@ -25,7 +25,6 @@ import ColorCard from './Cards/ColorCard';
 import CardDivider from './CardDivider';
 import NoConnectionDialog from './NoConnectionDialog';
 
-
 const drawerWidth = 160;
 
 const useStyles = makeStyles((theme) => ({
@@ -54,7 +53,6 @@ const useStyles = makeStyles((theme) => ({
   },
   toolbar: theme.mixins.toolbar,
 }));
-
 
 export default function Dashboard() {
   const classes = useStyles();
@@ -202,7 +200,7 @@ export default function Dashboard() {
             variant="h6"
             noWrap
             onClick={() => {
-              history.push('/', { isForceDetectNew: true });
+              history.push('/', { isForceStayOnDetector: true });
             }}
           >
             To Device Discovery
