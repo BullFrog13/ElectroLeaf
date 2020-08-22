@@ -5,7 +5,6 @@ import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import { useHistory } from 'react-router-dom';
 import { NanoleafClient } from 'nanoleaf-client';
-import axios from 'axios';
 import { Typography } from '@material-ui/core';
 import CustomStepper from './CustomStepper';
 import StepTwo from './StepTwo';
@@ -63,12 +62,9 @@ export default function DeviceDetector() {
   const history = useHistory();
 
   const [state, setState] = useState({
-    isDiscoverRunning: false,
-    discoveredDevices: [],
     selectedDevice: {},
     activeStep: 0,
     savedDeviceConfig: null,
-    noDevicesFoundFlag: false,
     authorizationFailed: false,
     isForceStayOnThisScreen: (history.location.state)
       ? history.location.state.isForceStayOnDetector : false,
@@ -99,28 +95,6 @@ export default function DeviceDetector() {
     setState({
       ...state,
       activeStep: state.activeStep + 1,
-    });
-  };
-
-  const discover = () => {
-    setState({ ...state, isDiscoverRunning: true });
-    axios.get('http://localhost:3001/discover').then((res) => {
-      if (res.data.length === 0) {
-        setState({ ...state, noDevicesFoundFlag: true });
-
-        return;
-      }
-
-      const devices = res.data.filter(
-        (device, index, self) => index === self.findIndex(t => t.uuid === device.uuid),
-      );
-
-      setState({
-        ...state,
-        discoveredDevices: devices,
-        isDiscoverRunning: false,
-        noDevicesFoundFlag: false,
-      });
     });
   };
 
@@ -173,17 +147,15 @@ export default function DeviceDetector() {
               className={classes.submit}
               onClick={goToDiscoveryStep}
             >
-              { state.noDevicesFoundFlag ? 'Retry Discovery' : 'Discover Devices' }
+              Select Device
             </Button>
           </Grid>
         )}
         {state.activeStep === 1 && (
           <StepTwo
             selectDevice={selectDevice}
-            discoveredDevices={state.discoveredDevices}
             savedDevice={state.savedDeviceConfig}
             useSavedDevice={useSavedDevice}
-            discover={discover}
           />
         )}
         {state.activeStep === 2 && (
@@ -201,13 +173,11 @@ export default function DeviceDetector() {
             >
               Authorize
             </Button>
-
             { state.authorizationFailed && (
             <Typography className={classes.redText}>
               Authorization failed. Make sure the white LED is blinking.
             </Typography>
             )}
-
           </Grid>
         )}
       </Grid>

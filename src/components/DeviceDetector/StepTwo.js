@@ -10,6 +10,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import { makeStyles } from '@material-ui/core/styles';
 import DetailsIcon from '@material-ui/icons/Details';
 import { green } from '@material-ui/core/colors';
+import axios from 'axios';
 import CardDivider from '../Dashboard/CardDivider';
 
 const useStyles = makeStyles((theme) => ({
@@ -17,7 +18,11 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.primary.light,
   },
   whiteText: {
-    color: theme.palette.primary.contrastText,
+    color: theme.palette.common.white,
+  },
+  title: {
+    marginTop: theme.spacing(1),
+    color: theme.palette.common.white,
   },
   discoverButton: {
     margin: theme.spacing(3, 0, 2),
@@ -28,13 +33,36 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function StepTwo({ selectDevice, useSavedDevice, discoveredDevices, savedDevice, discover }) {
+export default function StepTwo({ selectDevice, useSavedDevice, savedDevice }) {
   const classes = useStyles();
 
-  const [discoverRunning, setDiscoverRunning] = useState(false);
-  const startDiscovery = () => {
-    setDiscoverRunning(true);
-    discover();
+  const [state, setState] = useState({
+    isDiscoveryRunning: false,
+    discoveredDevices: [],
+    noDevicesFound: false,
+  });
+
+  const discover = () => {
+    setState({ ...state, isDiscoveryRunning: true });
+    axios.get('http://localhost:3001/discover').then((res) => {
+      if (res.data.length === 0) {
+        setState({
+          ...state,
+          noDevicesFound: true,
+          isDiscoveryRunning: false });
+      } else {
+        const devices = res.data.filter(
+          (device, index, self) => index === self.findIndex(t => t.uuid === device.uuid),
+        );
+
+        setState({
+          ...state,
+          discoveredDevices: devices,
+          isDiscoveryRunning: false,
+          noDevicesFound: false,
+        });
+      }
+    });
   };
 
   return (
@@ -60,32 +88,36 @@ export default function StepTwo({ selectDevice, useSavedDevice, discoveredDevice
             />
           </ListItem>
         </List>
-        {(discoveredDevices && discoveredDevices.length > 0) || (
+      </div>
+      )}
+      {!(state.discoveredDevices && state.discoveredDevices.length > 0) && !state.isDiscoveryRunning && (
         <Button
           type="submit"
           fullWidth
           variant="contained"
           color="primary"
           className={classes.discoverButton}
-          onClick={startDiscovery}
+          onClick={discover}
         >
-          Discover Devices
+          { state.noDevicesFound ? 'Retry Discovery' : 'Discover New Devices'}
         </Button>
-        )}
-      </div>
       )}
       {
-        (discoverRunning && !(discoveredDevices && discoveredDevices.length > 0))
+        state.isDiscoveryRunning
           && <LinearProgress className={classes.loadingBar} variant="query" color="secondary" />
       }
-      {(!savedDevice || (discoveredDevices && discoveredDevices.length > 0)) && (
+      {
+        state.noDevicesFound
+          && <Typography className={classes.title}>No new devices were found</Typography>
+      }
+      {(state.discoveredDevices && state.discoveredDevices.length > 0) && (
         <div>
           {savedDevice && <CardDivider />}
-          <Typography variant="h6" className={classes.whiteText}>
+          <Typography variant="h6" className={classes.title}>
             Discovered Devices
           </Typography>
           <List>
-            {discoveredDevices.map((device) => (
+            {state.discoveredDevices.map((device) => (
               <ListItem
                 button
                 onClick={() => selectDevice(device)}
