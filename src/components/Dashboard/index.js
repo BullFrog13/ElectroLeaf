@@ -25,7 +25,6 @@ import ColorCard from './Cards/ColorCard';
 import CardDivider from './CardDivider';
 import NoConnectionDialog from './NoConnectionDialog';
 
-
 const drawerWidth = 160;
 
 const useStyles = makeStyles((theme) => ({
@@ -54,7 +53,6 @@ const useStyles = makeStyles((theme) => ({
   },
   toolbar: theme.mixins.toolbar,
 }));
-
 
 export default function Dashboard() {
   const classes = useStyles();
@@ -130,7 +128,7 @@ export default function Dashboard() {
       getAndUpdateState();
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const updateDeviceBrightness = (_event, brightness) => {
     state.nanoleafClient.setBrightness(brightness)
