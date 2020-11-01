@@ -200,7 +200,7 @@ export default function Dashboard() {
             variant="h6"
             noWrap
             onClick={() => {
-              history.push('/', { isForceDetectNew: true });
+              history.push('/', { isForceStayOnDetector: true });
             }}
           >
             To Device Discovery
