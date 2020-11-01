@@ -6,6 +6,8 @@ import Grid from '@material-ui/core/Grid';
 import { useHistory } from 'react-router-dom';
 import { NanoleafClient } from 'nanoleaf-client';
 import { Typography } from '@material-ui/core';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 import CustomStepper from './CustomStepper';
 import StepTwo from './StepTwo';
 import { updateConfig, getConfig } from '../../services/config-service';
@@ -57,6 +59,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 export default function DeviceDetector() {
   const classes = useStyles();
   const history = useHistory();
@@ -68,6 +74,8 @@ export default function DeviceDetector() {
     authorizationFailed: false,
     isForceStayOnThisScreen: (history.location.state)
       ? history.location.state.isForceStayOnDetector : false,
+    showSavedDeviceError: false,
+    isSavedDeviceConnecting: false,
   });
 
   const goToDashboard = (location, token, uuid) => {
@@ -106,9 +114,26 @@ export default function DeviceDetector() {
     });
   };
 
+  const handleCloseSavedDeviceError = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setState({ ...state, showSavedDeviceError: false });
+  };
+
   const useSavedDevice = () => {
     const { location, deviceId, token } = state.savedDeviceConfig;
-    goToDashboard(location, token, deviceId);
+    const tempNanoleafClient = new NanoleafClient(new URL(location).hostname, token);
+    setState({ ...state, isSavedDeviceConnecting: true });
+
+    tempNanoleafClient.getInfo().then(() => {
+      setState({ ...state, isSavedDeviceConnecting: false });
+
+      goToDashboard(location, token, deviceId);
+    }).catch(() => {
+      setState({ ...state, showSavedDeviceError: true, isSavedDeviceConnecting: false });
+    });
   };
 
   const authorize = () => {
@@ -156,12 +181,14 @@ export default function DeviceDetector() {
             selectDevice={selectDevice}
             savedDevice={state.savedDeviceConfig}
             useSavedDevice={useSavedDevice}
+            isSavedDeviceConnecting={state.isSavedDeviceConnecting}
           />
         )}
         {state.activeStep === 2 && (
           <Grid item className={classes.grid} xs={4}>
             <Typography className={classes.whiteText}>
-              Hold the on/off button for 5-7 seconds until the white LED starts flashing in a pattern, then authorize.
+              Hold the on/off button for 5-7 seconds until the white LED starts
+              flashing in a pattern, then authorize.
             </Typography>
             <Button
               type="submit"
@@ -181,6 +208,16 @@ export default function DeviceDetector() {
           </Grid>
         )}
       </Grid>
+      <Snackbar
+        open={state.showSavedDeviceError}
+        autoHideDuration={4000}
+        onClose={handleCloseSavedDeviceError}
+      >
+        <Alert onClose={handleCloseSavedDeviceError} severity="error">
+          We couldn&apos;t connect to the saved device!
+          Make sure device is online or try discovering new device.
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }

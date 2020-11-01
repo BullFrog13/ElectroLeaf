@@ -10,6 +10,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import { makeStyles } from '@material-ui/core/styles';
 import DetailsIcon from '@material-ui/icons/Details';
 import { green } from '@material-ui/core/colors';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import axios from 'axios';
 import CardDivider from '../Dashboard/CardDivider';
 
@@ -33,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function StepTwo({ selectDevice, useSavedDevice, savedDevice }) {
+export default function StepTwo({ selectDevice, useSavedDevice, savedDevice, isSavedDeviceConnecting }) {
   const classes = useStyles();
 
   const [state, setState] = useState({
@@ -86,6 +87,10 @@ export default function StepTwo({ selectDevice, useSavedDevice, savedDevice }) {
               secondary={savedDevice.location}
               classes={{ primary: classes.whiteText, secondary: classes.grayText }}
             />
+            {
+              isSavedDeviceConnecting
+            && <CircularProgress color="secondary" />
+            }
           </ListItem>
         </List>
       </div>
