@@ -52,6 +52,9 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(3),
   },
   toolbar: theme.mixins.toolbar,
+  displayFlex: {
+    display: 'flex',
+  },
 }));
 
 export default function Dashboard() {
@@ -236,8 +239,8 @@ export default function Dashboard() {
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={2}>
-            <Grid item xs={6} md={6} lg={6}>
-              <NanoleafLayout data={state.layout} svgStyle={{ height: '60vh', maxHeight: '400px', margin: '-15px 0' }} />
+            <Grid className={classes.displayFlex} item xs={6} md={6} lg={6}>
+              <NanoleafLayout data={state.layout} svgStyle={{ width: '100%', margin: '-15px 0' }} />
             </Grid>
             <Grid item xs={6} md={6} lg={6}>
               <ColorCard
