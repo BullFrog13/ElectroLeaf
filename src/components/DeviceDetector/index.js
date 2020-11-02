@@ -71,28 +71,31 @@ export default function DeviceDetector() {
     });
   };
 
-  const tryUseSavedDevice = (location, deviceId, token, setConfigState = false) => {
+  const tryUseSavedDevice = (config, setConfigState = false) => {
+    const { location, token, deviceId } = config;
     const tempNanoleafClient = new NanoleafClient(new URL(location).hostname, token);
     if (setConfigState) {
       setState({ ...state,
         isSavedDeviceConnecting: true,
-        savedDeviceConfig: { location, deviceId, token } });
+        savedDeviceConfig: config });
     } else {
       setState({ ...state, isSavedDeviceConnecting: true });
     }
 
     tempNanoleafClient.getInfo().then(() => {
-      setState({ ...state, isSavedDeviceConnecting: false });
+      setState(prevState => ({ ...prevState, isSavedDeviceConnecting: false }));
       goToDashboard(location, token, deviceId);
     }).catch(() => {
-      setState({ ...state, showSavedDeviceError: true, isSavedDeviceConnecting: false });
+      setState(prevState => ({ ...prevState,
+        showSavedDeviceError: true,
+        isSavedDeviceConnecting: false }));
     });
   };
 
   const tryUseSavedConfig = () => {
     getConfig().then((config) => {
       if (!state.isForceStayOnThisScreen && config) {
-        tryUseSavedDevice(config.location, config.token, config.deviceId, true);
+        tryUseSavedDevice(config, true);
       } else if (config) {
         setState({ ...state, savedDeviceConfig: config });
       }
@@ -175,8 +178,7 @@ export default function DeviceDetector() {
             selectDevice={selectDevice}
             savedDevice={state.savedDeviceConfig}
             useSavedDevice={() => {
-              const { location, deviceId, token } = state.savedDeviceConfig;
-              tryUseSavedDevice(location, deviceId, token);
+              tryUseSavedDevice(state.savedDeviceConfig);
             }}
             isSavedDeviceConnecting={state.isSavedDeviceConnecting}
           />
