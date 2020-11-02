@@ -95,7 +95,8 @@ export default function StepTwo({ selectDevice, useSavedDevice, savedDevice, isS
         </List>
       </div>
       )}
-      {!(state.discoveredDevices && state.discoveredDevices.length > 0) && !state.isDiscoveryRunning && (
+      {!(state.discoveredDevices && state.discoveredDevices.length > 0)
+        && !state.isDiscoveryRunning && (
         <Button
           type="submit"
           fullWidth

@@ -8,6 +8,7 @@ import { NanoleafClient } from 'nanoleaf-client';
 import { Typography } from '@material-ui/core';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+import LinearProgress from '@material-ui/core/LinearProgress';
 import CustomStepper from './CustomStepper';
 import StepTwo from './StepTwo';
 import { updateConfig, getConfig } from '../../services/config-service';
@@ -22,10 +23,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
+    width: '100vw',
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
@@ -40,22 +38,10 @@ const useStyles = makeStyles((theme) => ({
   redText: {
     color: theme.palette.error.main,
   },
-  ipTextField: {
-    marginTop: theme.spacing(2),
+  connectingProgress: {
     width: '100%',
-  },
-  paper: {
-    backgroundColor: theme.palette.background.default,
-    border: '2px solid #000',
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(2, 4, 3),
-    color: theme.palette.primary.contrastText,
-  },
-  displayCenter: {
-    textAlign: 'center',
-  },
-  title: {
-    color: 'white',
+    marginTop: theme.spacing(3),
+    height: theme.spacing(0.5),
   },
 }));
 
@@ -85,10 +71,31 @@ export default function DeviceDetector() {
     });
   };
 
+  const tryUseSavedDevice = (config, setConfigState = false) => {
+    const { location, token, deviceId } = config;
+    const tempNanoleafClient = new NanoleafClient(new URL(location).hostname, token);
+    if (setConfigState) {
+      setState({ ...state,
+        isSavedDeviceConnecting: true,
+        savedDeviceConfig: config });
+    } else {
+      setState({ ...state, isSavedDeviceConnecting: true });
+    }
+
+    tempNanoleafClient.getInfo().then(() => {
+      setState(prevState => ({ ...prevState, isSavedDeviceConnecting: false }));
+      goToDashboard(location, token, deviceId);
+    }).catch(() => {
+      setState(prevState => ({ ...prevState,
+        showSavedDeviceError: true,
+        isSavedDeviceConnecting: false }));
+    });
+  };
+
   const tryUseSavedConfig = () => {
     getConfig().then((config) => {
       if (!state.isForceStayOnThisScreen && config) {
-        goToDashboard(config.location, config.token, config.deviceId);
+        tryUseSavedDevice(config, true);
       } else if (config) {
         setState({ ...state, savedDeviceConfig: config });
       }
@@ -122,20 +129,6 @@ export default function DeviceDetector() {
     setState({ ...state, showSavedDeviceError: false });
   };
 
-  const useSavedDevice = () => {
-    const { location, deviceId, token } = state.savedDeviceConfig;
-    const tempNanoleafClient = new NanoleafClient(new URL(location).hostname, token);
-    setState({ ...state, isSavedDeviceConnecting: true });
-
-    tempNanoleafClient.getInfo().then(() => {
-      setState({ ...state, isSavedDeviceConnecting: false });
-
-      goToDashboard(location, token, deviceId);
-    }).catch(() => {
-      setState({ ...state, showSavedDeviceError: true, isSavedDeviceConnecting: false });
-    });
-  };
-
   const authorize = () => {
     const client = new NanoleafClient(new URL(state.selectedDevice.location).hostname);
 
@@ -158,29 +151,35 @@ export default function DeviceDetector() {
           <CustomStepper activeStep={state.activeStep} />
         </Grid>
         {state.activeStep === 0 && (
-          <Grid item className={classes.grid} xs={4}>
-            {
-              state.noDevicesFoundFlag && (
-              <Typography className={classes.title}>Device not found</Typography>
-              )
-            }
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-              onClick={goToDiscoveryStep}
-            >
-              Select Device
-            </Button>
-          </Grid>
+          state.isSavedDeviceConnecting
+            ? (
+              <Grid item className={classes.grid} xs={4}>
+                <Typography className={classes.whiteText}>Connecting to saved device</Typography>
+                <LinearProgress className={classes.connectingProgress} color="secondary" />
+              </Grid>
+            )
+            : (
+              <Grid item className={classes.grid} xs={4}>
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                  onClick={goToDiscoveryStep}
+                >
+                  Select Device
+                </Button>
+              </Grid>
+            )
         )}
         {state.activeStep === 1 && (
           <StepTwo
             selectDevice={selectDevice}
             savedDevice={state.savedDeviceConfig}
-            useSavedDevice={useSavedDevice}
+            useSavedDevice={() => {
+              tryUseSavedDevice(state.savedDeviceConfig);
+            }}
             isSavedDeviceConnecting={state.isSavedDeviceConnecting}
           />
         )}
@@ -210,7 +209,7 @@ export default function DeviceDetector() {
       </Grid>
       <Snackbar
         open={state.showSavedDeviceError}
-        autoHideDuration={4000}
+        autoHideDuration={6000}
         onClose={handleCloseSavedDeviceError}
       >
         <Alert onClose={handleCloseSavedDeviceError} severity="error">
