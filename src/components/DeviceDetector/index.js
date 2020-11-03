@@ -82,7 +82,7 @@ export default function DeviceDetector() {
       setState({ ...state, isSavedDeviceConnecting: true });
     }
 
-    tempNanoleafClient.getInfo().then(() => {
+    tempNanoleafClient.identify().then(() => {
       setState(prevState => ({ ...prevState, isSavedDeviceConnecting: false }));
       goToDashboard(location, token, deviceId);
     }).catch(() => {

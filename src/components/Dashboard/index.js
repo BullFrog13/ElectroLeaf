@@ -28,9 +28,6 @@ import NoConnectionDialog from './NoConnectionDialog';
 const drawerWidth = 160;
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-  },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
   },
@@ -51,6 +48,9 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
   },
+  container: {
+    padding: 0,
+  },
   toolbar: theme.mixins.toolbar,
   displayFlex: {
     display: 'flex',
@@ -64,7 +64,7 @@ export default function Dashboard() {
   const query = new URLSearchParams(history.location.search);
   const token = query.get('token');
   const location = query.get('location');
-  // const deviceId = query.get('deviceId');
+  // const deviceId = query.get('deviceId'); We're sending but not using it at the moment
 
   if (!(token && location)) history.push('');
 
@@ -88,30 +88,24 @@ export default function Dashboard() {
   const getAndUpdateState = () => {
     if (navigator.onLine) {
       const { nanoleafClient } = state;
-      const getInfoPromise = nanoleafClient.getInfo();
-
-      Promise.all([getInfoPromise])
-        .then(responses => {
-          const deviceInfo = responses[0];
-
-          if (deviceInfo.state) {
-            setState({
-              ...state,
-              brightness: deviceInfo.state.brightness.value,
-              power: deviceInfo.state.on.value,
-              ctValue: (deviceInfo.state.ct.value - 1200) / 53,
-              layout: deviceInfo.panelLayout.layout,
-              color: convert.hsv.hex([
-                deviceInfo.state.hue.value,
-                deviceInfo.state.sat.value,
-                deviceInfo.state.brightness.value,
-              ]),
-              effectList: deviceInfo.effects.effectsList,
-              selectedEffect: (deviceInfo.effects.select === '*Solid*') ? '' : deviceInfo.effects.select,
-              colorMode: deviceInfo.state.colorMode,
-            });
-          }
-        });
+      nanoleafClient.getInfo().then(deviceInfo => {
+        if (deviceInfo.state) {
+          setState({ ...state,
+            brightness: deviceInfo.state.brightness.value,
+            power: deviceInfo.state.on.value,
+            ctValue: (deviceInfo.state.ct.value - 1200) / 53,
+            layout: deviceInfo.panelLayout.layout,
+            color: convert.hsv.hex([
+              deviceInfo.state.hue.value,
+              deviceInfo.state.sat.value,
+              deviceInfo.state.brightness.value,
+            ]),
+            effectList: deviceInfo.effects.effectsList,
+            selectedEffect: (deviceInfo.effects.select === '*Solid*') ? '' : deviceInfo.effects.select,
+            colorMode: deviceInfo.state.colorMode,
+          });
+        }
+      });
     } else if (!state.openConnectionDialog) {
       setState({ ...state, openConnectionDialog: true });
     }
@@ -120,8 +114,9 @@ export default function Dashboard() {
   const updateColorMode = () => {
     const { nanoleafClient } = state;
 
-    nanoleafClient.getColorMode().then(colorMode => {
-      setState({ ...state, colorMode });
+    nanoleafClient.getInfo().then(deviceInfo => {
+      const { colorMode, brightness } = deviceInfo.state;
+      setState(prevState => ({ ...prevState, colorMode, brightness: brightness.value }));
     });
   };
 
@@ -161,14 +156,13 @@ export default function Dashboard() {
   };
 
   const updateColor = color => {
-    setState({ ...state, color });
+    setState({ ...state, color: color.hex.substring(1) });
   };
 
   const selectEffect = (event) => {
     const { value } = event.target;
     state.nanoleafClient.setEffect(value)
-      .then(() => { updateColorMode(); });
-    setState({ ...state, selectedEffect: value });
+      .then(() => { updateColorMode({ selectedEffect: value }); });
   };
 
   const closeConnectionDialog = () => {
@@ -188,7 +182,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className={classes.root}>
+    <div className={classes.displayFlex}>
       <AppBar
         position="fixed"
         className={classes.appBar}
