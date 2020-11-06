@@ -163,6 +163,7 @@ export default function Dashboard() {
     const { value } = event.target;
     state.nanoleafClient.setEffect(value)
       .then(() => { updateColorMode({ selectedEffect: value }); });
+    setState({ ...state, selectedEffect: value });
   };
 
   const closeConnectionDialog = () => {
