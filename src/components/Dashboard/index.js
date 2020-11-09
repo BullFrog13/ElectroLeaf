@@ -78,6 +78,7 @@ export default function Dashboard() {
       sideLength: 0,
       positionData: [],
     },
+    rotation: 0,
     color: '',
     effectList: [],
     selectedEffect: '',
@@ -95,6 +96,7 @@ export default function Dashboard() {
             power: deviceInfo.state.on.value,
             ctValue: (deviceInfo.state.ct.value - 1200) / 53,
             layout: deviceInfo.panelLayout.layout,
+            rotation: deviceInfo.panelLayout.globalOrientation.value - deviceInfo.panelLayout.globalOrientation.max,
             color: convert.hsv.hex([
               deviceInfo.state.hue.value,
               deviceInfo.state.sat.value,
@@ -235,7 +237,7 @@ export default function Dashboard() {
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={2}>
             <Grid className={classes.displayFlex} item xs={6} md={6} lg={6}>
-              <NanoleafLayout data={state.layout} svgStyle={{ width: '100%', margin: '-15px 0' }} />
+              <NanoleafLayout data={state.layout} svgStyle={{ width: '100%', margin: '-15px 0', transform: `rotate(${state.rotation}deg)` }} />
             </Grid>
             <Grid item xs={6} md={6} lg={6}>
               <ColorCard
