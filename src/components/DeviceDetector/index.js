@@ -104,7 +104,7 @@ export default function DeviceDetector() {
 
   useEffect(() => {
     tryUseSavedConfig();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const goToDiscoveryStep = () => {
     setState({

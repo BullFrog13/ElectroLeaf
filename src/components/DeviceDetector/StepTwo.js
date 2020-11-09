@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import List from '@material-ui/core/List';
@@ -9,7 +9,7 @@ import Button from '@material-ui/core/Button';
 import ListItemText from '@material-ui/core/ListItemText';
 import { makeStyles } from '@material-ui/core/styles';
 import DetailsIcon from '@material-ui/icons/Details';
-import { green } from '@material-ui/core/colors';
+import { green, red } from '@material-ui/core/colors';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import axios from 'axios';
 import CardDivider from '../Dashboard/CardDivider';
@@ -41,7 +41,27 @@ export default function StepTwo({ selectDevice, useSavedDevice, savedDevice, isS
     isDiscoveryRunning: false,
     discoveredDevices: [],
     noDevicesFound: false,
+    savedDeviceActive: false,
   });
+
+  useEffect(() => {
+    axios.get(savedDevice.location, { timeout: 3000 }).then(() => { })
+      .catch(error => {
+        let deviceActive = false;
+        if (error.response && error.response.status === 422) {
+          deviceActive = true;
+        }
+
+        if (error.code === 'ECONNABORTED') {
+          deviceActive = false;
+        }
+
+        setState({
+          ...state,
+          savedDeviceActive: deviceActive,
+        });
+      });
+  }, []);
 
   const discover = () => {
     setState({ ...state, isDiscoveryRunning: true });
@@ -50,7 +70,8 @@ export default function StepTwo({ selectDevice, useSavedDevice, savedDevice, isS
         setState({
           ...state,
           noDevicesFound: true,
-          isDiscoveryRunning: false });
+          isDiscoveryRunning: false,
+        });
       } else {
         const devices = res.data.filter(
           (device, index, self) => index === self.findIndex(t => t.uuid === device.uuid),
@@ -80,7 +101,7 @@ export default function StepTwo({ selectDevice, useSavedDevice, savedDevice, isS
             onClick={useSavedDevice}
           >
             <ListItemIcon>
-              <DetailsIcon fontSize="large" style={{ color: green[500] }} />
+              <DetailsIcon fontSize="large" style={{ color: state.savedDeviceActive ? green[500] : red[500] }} />
             </ListItemIcon>
             <ListItemText
               primary={savedDevice.deviceId}
