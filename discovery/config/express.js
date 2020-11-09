@@ -37,7 +37,6 @@ function discoverNanoleaf() {
   });
 
   socket.on('message', (chunk, info) => { // eslint-disable-line no-unused-vars
-    console.log('message');
     const response = chunk
       .toString()
       .trim()

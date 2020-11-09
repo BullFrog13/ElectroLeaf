@@ -175,13 +175,8 @@ export default function Dashboard() {
   const switchPower = (event) => {
     const { checked } = event.target;
 
-    if (checked === true) {
-      state.nanoleafClient.turnOn()
-        .then(() => { updatePower(checked); });
-    } else if (checked === false) {
-      state.nanoleafClient.turnOff()
-        .then(() => { updatePower(checked); });
-    }
+    state.nanoleafClient.power(checked)
+      .then(() => { updatePower(checked); });
   };
 
   return (
