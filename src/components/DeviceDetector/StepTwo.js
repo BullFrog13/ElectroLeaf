@@ -2,17 +2,26 @@ import React, { useState, useEffect } from 'react';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import List from '@material-ui/core/List';
+import IconButton from '@material-ui/core/IconButton';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import Button from '@material-ui/core/Button';
 import ListItemText from '@material-ui/core/ListItemText';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 import DetailsIcon from '@material-ui/icons/Details';
-import { green, red } from '@material-ui/core/colors';
+import { green, red, grey } from '@material-ui/core/colors';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import axios from 'axios';
+import Tooltip from '@material-ui/core/Tooltip';
 import CardDivider from '../Dashboard/CardDivider';
+import {
+  UNPROCCESSABLE_ENTITY_HTTP_CODE,
+  DEFAULT_REQUEST_TIMEOUT,
+  DISCOVERY_SERVICE_URL,
+  CONNECTION_ABORTED_HTTP_RESPONSE_CODE,
+} from '../../constants';
 
 const useStyles = makeStyles((theme) => ({
   grayText: {
@@ -32,6 +41,14 @@ const useStyles = makeStyles((theme) => ({
   loadingBar: {
     width: '100%',
   },
+  savedDeviceText: {
+    color: theme.palette.common.white,
+    display: 'inline',
+  },
+  savedDeviceHintText: {
+    display: 'flex',
+    alignItems: 'center',
+  },
 }));
 
 export default function StepTwo({ selectDevice, useSavedDevice, savedDevice, isSavedDeviceConnecting }) {
@@ -45,14 +62,15 @@ export default function StepTwo({ selectDevice, useSavedDevice, savedDevice, isS
   });
 
   useEffect(() => {
-    axios.get(savedDevice.location, { timeout: 3000 }).then(() => { })
-      .catch(error => {
+    if (savedDevice) {
+      axios.get(savedDevice.location, { timeout: DEFAULT_REQUEST_TIMEOUT }).then(() => { }, error => {
         let deviceActive = false;
-        if (error.response && error.response.status === 422) {
+
+        if (error.response && error.response.status === UNPROCCESSABLE_ENTITY_HTTP_CODE) {
           deviceActive = true;
         }
 
-        if (error.code === 'ECONNABORTED') {
+        if (error.code === CONNECTION_ABORTED_HTTP_RESPONSE_CODE) {
           deviceActive = false;
         }
 
@@ -61,11 +79,12 @@ export default function StepTwo({ selectDevice, useSavedDevice, savedDevice, isS
           savedDeviceActive: deviceActive,
         });
       });
+    }
   }, []);
 
   const discover = () => {
     setState({ ...state, isDiscoveryRunning: true });
-    axios.get('http://localhost:3001/discover').then((res) => {
+    axios.get(`${DISCOVERY_SERVICE_URL}/discover`).then((res) => {
       if (res.data.length === 0) {
         setState({
           ...state,
@@ -87,14 +106,44 @@ export default function StepTwo({ selectDevice, useSavedDevice, savedDevice, isS
     });
   };
 
+  const HtmlTooltip = withStyles((theme) => ({
+    tooltip: {
+      backgroundColor: '#f5f5f9',
+      color: 'rgba(0, 0, 0, 0.87)',
+      maxWidth: 220,
+      fontSize: theme.typography.pxToRem(12),
+      border: '1px solid #dadde9',
+    },
+  }))(Tooltip);
+
   return (
     <Grid item xs={4}>
       {savedDevice
       && (
       <div>
-        <Typography variant="h6" className={classes.whiteText}>
-          Saved Device
-        </Typography>
+        <div className={classes.savedDeviceHintText}>
+          <Typography variant="h6" className={classes.savedDeviceText}>
+            Saved Device
+          </Typography>
+          <HtmlTooltip
+            title={(
+              <>
+                <div className={classes.savedDeviceHintText}>
+                  <DetailsIcon fontSize="large" style={{ color: green[500] }} />
+                  <p>Device is connected.</p>
+                </div>
+                <div className={classes.savedDeviceHintText}>
+                  <DetailsIcon fontSize="large" style={{ color: red[500] }} />
+                  <p>Device is disconnected. Rediscover the device.</p>
+                </div>
+              </>
+        )}
+          >
+            <IconButton aria-label="hint" size="large">
+              <HelpOutlineIcon fontSize="inherit" style={{ color: grey[400] }} />
+            </IconButton>
+          </HtmlTooltip>
+        </div>
         <List>
           <ListItem
             button
