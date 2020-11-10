@@ -62,6 +62,7 @@ export default function DeviceDetector() {
     isForceStayOnThisScreen: (history.location.state)
       ? history.location.state.isForceStayOnDetector : false,
     showSavedDeviceError: false,
+    showNoDevicesFoundError: false,
     isSavedDeviceConnecting: false,
   });
 
@@ -130,6 +131,14 @@ export default function DeviceDetector() {
     setState({ ...state, showSavedDeviceError: false });
   };
 
+  const handleCloseDevicesNotFoundError = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setState({ ...state, showNoDevicesFoundError: false });
+  };
+
   const authorize = () => {
     const client = new NanoleafClient(new URL(state.selectedDevice.location).hostname);
 
@@ -143,6 +152,10 @@ export default function DeviceDetector() {
         authorizationFailed: true,
       });
     });
+  };
+
+  const showCloseDevicesNotFoundError = () => {
+    setState({ ...state, showNoDevicesFoundError: true });
   };
 
   return (
@@ -182,6 +195,7 @@ export default function DeviceDetector() {
               tryUseSavedDevice(state.savedDeviceConfig);
             }}
             isSavedDeviceConnecting={state.isSavedDeviceConnecting}
+            showCloseDevicesNotFoundError={showCloseDevicesNotFoundError}
           />
         )}
         {state.activeStep === 2 && (
@@ -216,6 +230,16 @@ export default function DeviceDetector() {
         <Alert onClose={handleCloseSavedDeviceError} severity="error">
           We couldn&apos;t connect to the saved device!
           Make sure device is online or try discovering new device.
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={state.showNoDevicesFoundError}
+        autoHideDuration={4500}
+        onClose={handleCloseDevicesNotFoundError}
+      >
+        <Alert onClose={handleCloseDevicesNotFoundError} severity="warning">
+          No devices were found.
+          Make sure the wi-fi is on and device is plugged in.
         </Alert>
       </Snackbar>
     </Container>
