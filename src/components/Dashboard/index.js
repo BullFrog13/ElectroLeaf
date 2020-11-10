@@ -24,6 +24,7 @@ import ActiveModeCard from './Cards/ActiveModeCard';
 import ColorCard from './Cards/ColorCard';
 import CardDivider from './CardDivider';
 import NoConnectionDialog from './NoConnectionDialog';
+import DeviceOfflineDialog from './DeviceOfflineDialog';
 
 const drawerWidth = 160;
 
@@ -84,6 +85,7 @@ export default function Dashboard() {
     selectedEffect: '',
     colorMode: '',
     openConnectionDialog: false,
+    deviceIsOffline: false,
   });
 
   const getAndUpdateState = () => {
@@ -96,7 +98,7 @@ export default function Dashboard() {
             power: deviceInfo.state.on.value,
             ctValue: (deviceInfo.state.ct.value - 1200) / 53,
             layout: deviceInfo.panelLayout.layout,
-            rotation: deviceInfo.panelLayout.globalOrientation.value - deviceInfo.panelLayout.globalOrientation.max,
+            rotation: deviceInfo.panelLayout.globalOrientation.value,
             color: convert.hsv.hex([
               deviceInfo.state.hue.value,
               deviceInfo.state.sat.value,
@@ -106,6 +108,10 @@ export default function Dashboard() {
             selectedEffect: (deviceInfo.effects.select === '*Solid*') ? '' : deviceInfo.effects.select,
             colorMode: deviceInfo.state.colorMode,
           });
+        }
+      }, error => {
+        if (error.status === 0) {
+          setState({ ...state, deviceIsOffline: true });
         }
       });
     } else if (!state.openConnectionDialog) {
@@ -170,6 +176,10 @@ export default function Dashboard() {
 
   const closeConnectionDialog = () => {
     setState({ ...state, openConnectionDialog: false });
+  };
+
+  const closeDeviceOfflineDialog = () => {
+    setState({ ...state, deviceIsOffline: false });
   };
 
   const switchPower = (event) => {
@@ -279,6 +289,14 @@ export default function Dashboard() {
       <NoConnectionDialog
         open={state.openConnectionDialog}
         closeDialog={closeConnectionDialog}
+        maxWidth="sm"
+        fullWidth
+        keepMounted
+      />
+      <DeviceOfflineDialog
+        open={state.deviceIsOffline}
+        closeDialog={closeDeviceOfflineDialog}
+        nanoleafClient={state.nanoleafClient}
         maxWidth="sm"
         fullWidth
         keepMounted

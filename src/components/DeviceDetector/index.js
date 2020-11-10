@@ -12,6 +12,7 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import CustomStepper from './CustomStepper';
 import StepTwo from './StepTwo';
 import { updateConfig, getConfig } from '../../services/config-service';
+import { DEFAULT_SNACKBAR_TIMEOUT } from '../../constants';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -209,7 +210,7 @@ export default function DeviceDetector() {
       </Grid>
       <Snackbar
         open={state.showSavedDeviceError}
-        autoHideDuration={6000}
+        autoHideDuration={DEFAULT_SNACKBAR_TIMEOUT}
         onClose={handleCloseSavedDeviceError}
       >
         <Alert onClose={handleCloseSavedDeviceError} severity="error">

@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function NoConnectionDialog({ open, closeDialog, ...other }) {
+export default function DeviceOfflineDialog({ open, closeDialog, nanoleafClient, ...other }) {
   const classes = useStyles();
   const [alertOpen, setAlertOpen] = React.useState(false);
 
@@ -39,11 +39,13 @@ export default function NoConnectionDialog({ open, closeDialog, ...other }) {
   };
 
   const tryConnect = () => {
-    if (navigator.onLine) {
+    nanoleafClient.getInfo().then(() => {
       closeDialog();
-    } else {
-      toggleAlert();
-    }
+    }, error => {
+      if (error.status === 0) {
+        toggleAlert();
+      }
+    });
   };
 
   return (
@@ -55,14 +57,14 @@ export default function NoConnectionDialog({ open, closeDialog, ...other }) {
       PaperProps={{ className: classes.dialogPaper }}
       {...other}
     >
-      <DialogTitle>No Connection<ErrorIcon className={classes.errorIcon} /></DialogTitle>
+      <DialogTitle>Device is offline<ErrorIcon className={classes.errorIcon} /></DialogTitle>
       <DialogContent>
-        <Typography>Looks like your connection is down.</Typography>
-        <Typography>Try reconnecting to Wi-Fi and try again.</Typography>
+        <Typography>Looks like your device is offline.</Typography>
+        <Typography>Make sure Nanoleaf is plugged and connected to WiFi.</Typography>
       </DialogContent>
       <DialogActions>
         <Button className={classes.tryButton} onClick={tryConnect} variant="contained" color="primary">
-          Try Again
+          Connect
         </Button>
       </DialogActions>
       <Snackbar open={alertOpen} autoHideDuration={DEFAULT_SNACKBAR_TIMEOUT} onClose={toggleAlert}>
