@@ -96,7 +96,7 @@ export default function Dashboard() {
             power: deviceInfo.state.on.value,
             ctValue: (deviceInfo.state.ct.value - 1200) / 53,
             layout: deviceInfo.panelLayout.layout,
-            rotation: deviceInfo.panelLayout.globalOrientation.value - deviceInfo.panelLayout.globalOrientation.max,
+            rotation: deviceInfo.panelLayout.globalOrientation.value,
             color: convert.hsv.hex([
               deviceInfo.state.hue.value,
               deviceInfo.state.sat.value,

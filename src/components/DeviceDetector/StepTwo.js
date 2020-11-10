@@ -51,7 +51,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function StepTwo({ selectDevice, useSavedDevice, savedDevice, isSavedDeviceConnecting }) {
+export default function StepTwo({
+  selectDevice,
+  useSavedDevice,
+  savedDevice,
+  isSavedDeviceConnecting,
+  showCloseDevicesNotFoundError }) {
   const classes = useStyles();
 
   const [state, setState] = useState({
@@ -63,22 +68,23 @@ export default function StepTwo({ selectDevice, useSavedDevice, savedDevice, isS
 
   useEffect(() => {
     if (savedDevice) {
-      axios.get(savedDevice.location, { timeout: DEFAULT_REQUEST_TIMEOUT }).then(() => { }, error => {
-        let deviceActive = false;
+      axios.get(savedDevice.location, { timeout: DEFAULT_REQUEST_TIMEOUT })
+        .then(() => { }, error => {
+          let deviceActive = false;
 
-        if (error.response && error.response.status === UNPROCCESSABLE_ENTITY_HTTP_CODE) {
-          deviceActive = true;
-        }
+          if (error.response && error.response.status === UNPROCCESSABLE_ENTITY_HTTP_CODE) {
+            deviceActive = true;
+          }
 
-        if (error.code === CONNECTION_ABORTED_HTTP_RESPONSE_CODE) {
-          deviceActive = false;
-        }
+          if (error.code === CONNECTION_ABORTED_HTTP_RESPONSE_CODE) {
+            deviceActive = false;
+          }
 
-        setState({
-          ...state,
-          savedDeviceActive: deviceActive,
+          setState({
+            ...state,
+            savedDeviceActive: deviceActive,
+          });
         });
-      });
     }
   }, []);
 
@@ -92,15 +98,20 @@ export default function StepTwo({ selectDevice, useSavedDevice, savedDevice, isS
           isDiscoveryRunning: false,
         });
       } else {
-        const devices = res.data.filter(
+        let devices = res.data.filter(
           (device, index, self) => index === self.findIndex(t => t.uuid === device.uuid),
         );
+
+        if (savedDevice) devices = devices.filter(d => d.location !== savedDevice.location);
+        const noDevicesFound = devices.length === 0;
+
+        if (noDevicesFound) showCloseDevicesNotFoundError();
 
         setState({
           ...state,
           discoveredDevices: devices,
           isDiscoveryRunning: false,
-          noDevicesFound: false,
+          noDevicesFound,
         });
       }
     });
@@ -134,12 +145,12 @@ export default function StepTwo({ selectDevice, useSavedDevice, savedDevice, isS
                 </div>
                 <div className={classes.savedDeviceHintText}>
                   <DetailsIcon fontSize="large" style={{ color: red[500] }} />
-                  <p>Device is disconnected. Rediscover the device.</p>
+                  <p>Your device configuration has changed. Please rediscover it.</p>
                 </div>
               </>
         )}
           >
-            <IconButton aria-label="hint" size="large">
+            <IconButton aria-label="hint" size="medium">
               <HelpOutlineIcon fontSize="inherit" style={{ color: grey[400] }} />
             </IconButton>
           </HtmlTooltip>
@@ -181,10 +192,6 @@ export default function StepTwo({ selectDevice, useSavedDevice, savedDevice, isS
       {
         state.isDiscoveryRunning
           && <LinearProgress className={classes.loadingBar} variant="query" color="secondary" />
-      }
-      {
-        state.noDevicesFound
-          && <Typography className={classes.title}>No new devices were found</Typography>
       }
       {(state.discoveredDevices && state.discoveredDevices.length > 0) && (
         <div>
