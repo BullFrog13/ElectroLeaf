@@ -102,10 +102,14 @@ export default function StepTwo({
           (device, index, self) => index === self.findIndex(t => t.uuid === device.uuid),
         );
 
-        if (savedDevice) devices = devices.filter(d => d.location !== savedDevice.location);
+        if (savedDevice) {
+          devices = devices.filter(d => d.location !== savedDevice.location);
+        }
         const noDevicesFound = devices.length === 0;
 
-        if (noDevicesFound) showCloseDevicesNotFoundError();
+        if (noDevicesFound) {
+          showCloseDevicesNotFoundError();
+        }
 
         setState({
           ...state,
