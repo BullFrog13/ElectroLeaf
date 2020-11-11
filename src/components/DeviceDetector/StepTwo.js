@@ -7,6 +7,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
+import CloseIcon from '@material-ui/icons/Close';
 import Button from '@material-ui/core/Button';
 import ListItemText from '@material-ui/core/ListItemText';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
@@ -56,7 +57,8 @@ export default function StepTwo({
   useSavedDevice,
   savedDevice,
   isSavedDeviceConnecting,
-  showCloseDevicesNotFoundError }) {
+  showCloseDevicesNotFoundError,
+  removeSavedDevice }) {
   const classes = useStyles();
 
   const [state, setState] = useState({
@@ -132,7 +134,7 @@ export default function StepTwo({
   }))(Tooltip);
 
   return (
-    <Grid item xs={4}>
+    <Grid item xs={8} sm={6} md={6} lg={4}>
       {savedDevice
       && (
       <div>
@@ -176,6 +178,9 @@ export default function StepTwo({
               isSavedDeviceConnecting
             && <CircularProgress color="secondary" />
             }
+            <IconButton aria-label="Remove saved device" onClick={removeSavedDevice}>
+              <CloseIcon fontSize="large" style={{ color: grey[100] }} />
+            </IconButton>
           </ListItem>
         </List>
       </div>
