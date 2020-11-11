@@ -178,7 +178,13 @@ export default function StepTwo({
               isSavedDeviceConnecting
             && <CircularProgress color="secondary" />
             }
-            <IconButton aria-label="Remove saved device" onClick={removeSavedDevice}>
+            <IconButton
+              aria-label="Remove saved device"
+              onClick={(e) => {
+                e.stopPropagation();
+                removeSavedDevice();
+              }}
+            >
               <CloseIcon fontSize="large" style={{ color: grey[100] }} />
             </IconButton>
           </ListItem>
