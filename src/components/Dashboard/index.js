@@ -1,19 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Drawer,
+import {
   AppBar,
   Toolbar,
-  List,
   Typography,
   Container,
   Grid,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
   Switch } from '@material-ui/core';
-import ChangeHistoryIcon from '@material-ui/icons/ChangeHistory';
 import { useHistory } from 'react-router-dom';
-import AppsIcon from '@material-ui/icons/Apps';
 import { NanoleafClient } from 'nanoleaf-client';
 import NanoleafLayout from 'nanoleaf-layout/lib/NanoleafLayout';
 import convert from 'color-convert';
@@ -22,10 +16,7 @@ import BrightnessCard from './Cards/BrightnessCard';
 import ColorTemperatureCard from './Cards/ColorTemperatureCard';
 import ActiveModeCard from './Cards/ActiveModeCard';
 import ColorCard from './Cards/ColorCard';
-import CardDivider from './CardDivider';
 import NoConnectionDialog from './NoConnectionDialog';
-
-const drawerWidth = 160;
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -35,21 +26,13 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   appBarSpacer: theme.mixins.toolbar,
-  drawer: {
-    width: drawerWidth,
-    flexShrink: 0,
-  },
-  drawerPaper: {
-    width: drawerWidth,
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.primary.contrastText,
-  },
   content: {
     flexGrow: 1,
     padding: theme.spacing(3),
   },
   container: {
     padding: 0,
+    maxWidth: 'none',
   },
   toolbar: theme.mixins.toolbar,
   displayFlex: {
@@ -202,34 +185,9 @@ export default function Dashboard() {
           </Typography>
         </Toolbar>
       </AppBar>
-      <Drawer
-        className={classes.drawer}
-        variant="permanent"
-        classes={{
-          paper: classes.drawerPaper,
-        }}
-      >
-        <div className={classes.toolbar} />
-        <List>
-          <ListItem button>
-            <ListItemIcon>
-              <AppsIcon color="secondary" />
-            </ListItemIcon>
-            <ListItemText primary="General" />
-          </ListItem>
-          <CardDivider />
-          <ListItem button>
-            <ListItemIcon>
-              <ChangeHistoryIcon color="secondary" />
-            </ListItemIcon>
-            <ListItemText primary="Devices" />
-          </ListItem>
-          <CardDivider />
-        </List>
-      </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
-        <Container maxWidth="lg" className={classes.container}>
+        <Container className={classes.container}>
           <Grid container spacing={2}>
             <Grid className={classes.displayFlex} item xs={6} md={6} lg={6}>
               <NanoleafLayout data={state.layout} svgStyle={{ width: '100%', margin: '-15px 0', transform: `rotate(${state.rotation}deg)` }} />
