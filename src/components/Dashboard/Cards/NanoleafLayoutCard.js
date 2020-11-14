@@ -1,26 +1,9 @@
-import React, { } from 'react';
-// import { makeStyles } from '@material-ui/core/styles';
-import { CardContent } from '@material-ui/core';
+import React from 'react';
 import Box from '@material-ui/core/Box';
 import NanoleafLayout from 'nanoleaf-layout/lib/NanoleafLayout';
-import CardWrapper from '../CardWrapper';
 import theme from '../../../theme';
 
-// const useStyles = makeStyles((theme) => ({
-//   chip: {
-//     marginBottom: theme.spacing(8),
-//   },
-//   slider: {
-//     width: '96%',
-//   },
-//   greyBg: {
-//     background: theme.palette.neutral.main,
-//   },
-// }));
-
 export default function NanoleafLayoutCard({ colorMode, color, layout, rotation }) {
-  // const classes = useStyles();
-
   const getConicGradientPalette = () => {
     let colorString = String();
 
