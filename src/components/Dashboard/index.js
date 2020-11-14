@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Drawer,
   AppBar,
@@ -17,6 +17,7 @@ import AppsIcon from '@material-ui/icons/Apps';
 import { NanoleafClient } from 'nanoleaf-client';
 import NanoleafLayout from 'nanoleaf-layout/lib/NanoleafLayout';
 import convert from 'color-convert';
+import Box from '@material-ui/core/Box';
 import ThemeCard from './Cards/ThemeCard';
 import BrightnessCard from './Cards/BrightnessCard';
 import ColorTemperatureCard from './Cards/ColorTemperatureCard';
@@ -24,6 +25,7 @@ import ActiveModeCard from './Cards/ActiveModeCard';
 import ColorCard from './Cards/ColorCard';
 import CardDivider from './CardDivider';
 import NoConnectionDialog from './NoConnectionDialog';
+import theme from '../../theme';
 
 const drawerWidth = 160;
 
@@ -86,11 +88,35 @@ export default function Dashboard() {
     openConnectionDialog: false,
   });
 
-  const getAndUpdateState = () => {
+  const stateRef = useRef({});
+  stateRef.current = state;
+
+  const updateLayoutSolidColor = (layout, hex) => {
+    Array.from(layout.positionData).forEach((panel) => {
+      panel.color = hex;
+    });
+
+    return layout;
+  };
+
+  const getAndUpdateState = (fromInterval) => {
     if (navigator.onLine) {
       const { nanoleafClient } = state;
       nanoleafClient.getInfo().then(deviceInfo => {
         if (deviceInfo.state) {
+          if (deviceInfo.state.colorMode === 'hs') {
+            deviceInfo.panelLayout.layout = updateLayoutSolidColor(deviceInfo.panelLayout.layout,
+              `#${convert.hsv.hex([
+                deviceInfo.state.hue.value,
+                deviceInfo.state.sat.value,
+                deviceInfo.state.brightness.value,
+              ])}`);
+          }
+
+          if (fromInterval && deviceInfo.state.colorMode === 'effect') {
+            deviceInfo.panelLayout.layout = stateRef.current.layout;
+          }
+
           setState({ ...state,
             brightness: deviceInfo.state.brightness.value,
             power: deviceInfo.state.on.value,
@@ -123,12 +149,33 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    getAndUpdateState();
+    getAndUpdateState(false);
+
     const interval = setInterval(() => {
-      getAndUpdateState();
+      getAndUpdateState(true);
     }, 5000);
     return () => clearInterval(interval);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (state.colorMode === 'effect') {
+      state.nanoleafClient.getEffectInfo(state.selectedEffect).then(response => {
+        const { layout } = state;
+        const panels = Array.from(layout.positionData);
+        const palette = Array.from(response.palette);
+
+        for (let i = 0, j = 0; i < panels.length; i++) {
+          const hex = `#${convert.hsv.hex(palette[j].hue, palette[j].saturation, palette[j].brightness)}`;
+
+          panels[i].color = hex;
+          // increment to next color in pallete or start from beginning
+          j = (j + 1) === palette.length ? 0 : j + 1;
+        }
+
+        setState({ ...state, layout });
+      });
+    }
+  }, [state.colorMode, state.selectedEffect]);
 
   const updateDeviceBrightness = (_event, brightness) => {
     state.nanoleafClient.setBrightness(brightness)
@@ -158,7 +205,9 @@ export default function Dashboard() {
   };
 
   const updateColor = color => {
-    setState({ ...state, color: color.hex.substring(1) });
+    const layout = updateLayoutSolidColor(state.layout, color.hex);
+
+    setState({ ...state, color: color.hex.substring(1), layout });
   };
 
   const selectEffect = (event) => {
@@ -177,6 +226,21 @@ export default function Dashboard() {
 
     state.nanoleafClient.power(checked)
       .then(() => { updatePower(checked); });
+  };
+
+  const getConicGradientPalette = () => {
+    let colorString = String();
+
+    const panels = Array.from(stateRef.current.layout.positionData);
+
+    panels.forEach(panel => {
+      colorString += `${panel.color},`;
+    });
+
+    // finishing with starting color to create smooth transition
+    colorString += panels[0].color;
+
+    return `conic-gradient(${colorString})`;
   };
 
   return (
@@ -231,8 +295,12 @@ export default function Dashboard() {
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={2}>
-            <Grid className={classes.displayFlex} item xs={6} md={6} lg={6}>
-              <NanoleafLayout data={state.layout} svgStyle={{ width: '100%', margin: '-15px 0', transform: `rotate(${state.rotation}deg)` }} />
+            <Grid className={classes.displayFlex} item xs={6} md={6} lg={6} style={{ justifyContent: 'center' }}>
+              <Box display="flex" style={{ width: '100%', height: '100%', background: state.colorMode === 'effect' ? getConicGradientPalette() : `#${state.color}`, borderRadius: '10px', justifyContent: 'center' }}>
+                <Box display="flex" style={{ width: '98%', height: '98%', marginTop: '1%', backgroundColor: theme.palette.primary.main, borderRadius: '10px', justifyContent: 'center' }}>
+                  <NanoleafLayout data={state.layout} svgStyle={{ width: '75%', marginLeft: '4%', transform: `rotate(${state.rotation}deg)` }} />
+                </Box>
+              </Box>
             </Grid>
             <Grid item xs={6} md={6} lg={6}>
               <ColorCard
