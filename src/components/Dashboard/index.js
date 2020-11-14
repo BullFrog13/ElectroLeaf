@@ -15,9 +15,7 @@ import ChangeHistoryIcon from '@material-ui/icons/ChangeHistory';
 import { useHistory } from 'react-router-dom';
 import AppsIcon from '@material-ui/icons/Apps';
 import { NanoleafClient } from 'nanoleaf-client';
-import NanoleafLayout from 'nanoleaf-layout/lib/NanoleafLayout';
 import convert from 'color-convert';
-import Box from '@material-ui/core/Box';
 import ThemeCard from './Cards/ThemeCard';
 import BrightnessCard from './Cards/BrightnessCard';
 import ColorTemperatureCard from './Cards/ColorTemperatureCard';
@@ -25,7 +23,7 @@ import ActiveModeCard from './Cards/ActiveModeCard';
 import ColorCard from './Cards/ColorCard';
 import CardDivider from './CardDivider';
 import NoConnectionDialog from './NoConnectionDialog';
-import theme from '../../theme';
+import NanoleafLayoutCard from './Cards/NanoleafLayoutCard';
 
 const drawerWidth = 160;
 
@@ -228,21 +226,6 @@ export default function Dashboard() {
       .then(() => { updatePower(checked); });
   };
 
-  const getConicGradientPalette = () => {
-    let colorString = String();
-
-    const panels = Array.from(stateRef.current.layout.positionData);
-
-    panels.forEach(panel => {
-      colorString += `${panel.color},`;
-    });
-
-    // finishing with starting color to create smooth transition
-    colorString += panels[0].color;
-
-    return `conic-gradient(${colorString})`;
-  };
-
   return (
     <div className={classes.displayFlex}>
       <AppBar
@@ -296,11 +279,12 @@ export default function Dashboard() {
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={2}>
             <Grid className={classes.displayFlex} item xs={6} md={6} lg={6} style={{ justifyContent: 'center' }}>
-              <Box display="flex" style={{ width: '100%', height: '100%', background: state.colorMode === 'effect' ? getConicGradientPalette() : `#${state.color}`, borderRadius: '10px', justifyContent: 'center' }}>
-                <Box display="flex" style={{ width: '98%', height: '98%', marginTop: '1%', backgroundColor: theme.palette.primary.main, borderRadius: '10px', justifyContent: 'center' }}>
-                  <NanoleafLayout data={state.layout} svgStyle={{ width: '75%', marginLeft: '4%', transform: `rotate(${state.rotation}deg)` }} />
-                </Box>
-              </Box>
+              <NanoleafLayoutCard
+                colorMode={state.colorMode}
+                color={state.color}
+                layout={state.layout}
+                rotation={state.rotation}
+              />
             </Grid>
             <Grid item xs={6} md={6} lg={6}>
               <ColorCard
