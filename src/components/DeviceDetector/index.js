@@ -11,8 +11,8 @@ import MuiAlert from '@material-ui/lab/Alert';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import CustomStepper from './CustomStepper';
 import StepTwo from './StepTwo';
-import { updateConfig, getConfig } from '../../services/config-service';
 import { DEFAULT_SNACKBAR_TIMEOUT } from '../../constants';
+import { updateConfig, getConfig, deleteConfig } from '../../services/config-service';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -158,6 +158,12 @@ export default function DeviceDetector() {
     setState({ ...state, showNoDevicesFoundError: true });
   };
 
+  const removeSavedDevice = () => {
+    deleteConfig().then(() => {
+      setState({ ...state, savedDeviceConfig: null });
+    });
+  };
+
   return (
     <Container component="main" className={classes.container}>
       <Grid container justify="center">
@@ -196,6 +202,7 @@ export default function DeviceDetector() {
             }}
             isSavedDeviceConnecting={state.isSavedDeviceConnecting}
             showCloseDevicesNotFoundError={showCloseDevicesNotFoundError}
+            removeSavedDevice={removeSavedDevice}
           />
         )}
         {state.activeStep === 2 && (
