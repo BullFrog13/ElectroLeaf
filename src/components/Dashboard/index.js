@@ -6,7 +6,8 @@ import {
   Typography,
   Container,
   Grid,
-  Switch } from '@material-ui/core';
+  Switch,
+  Button } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { NanoleafClient } from 'nanoleaf-client';
 import convert from 'color-convert';
@@ -38,6 +39,11 @@ const useStyles = makeStyles((theme) => ({
   toolbar: theme.mixins.toolbar,
   displayFlex: {
     display: 'flex',
+  },
+  iconButton: {
+    '&:hover': {
+      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    },
   },
 }));
 
@@ -231,15 +237,15 @@ export default function Dashboard() {
             <Switch checked={state.power} inputProps={{ 'aria-label': 'secondary checkbox' }} onChange={switchPower} />
           </Typography>
 
-          <Typography
-            variant="h6"
-            noWrap
+          <Button
+            variant="outlined"
+            color="secondary"
             onClick={() => {
               history.push('/', { isForceStayOnDetector: true });
             }}
           >
-            To Device Discovery
-          </Typography>
+            Device Discovery
+          </Button>
         </Toolbar>
       </AppBar>
       <main className={classes.content}>
