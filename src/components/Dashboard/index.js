@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   AppBar,
@@ -9,7 +9,6 @@ import {
   Switch } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { NanoleafClient } from 'nanoleaf-client';
-import NanoleafLayout from 'nanoleaf-layout/lib/NanoleafLayout';
 import convert from 'color-convert';
 import ThemeCard from './Cards/ThemeCard';
 import BrightnessCard from './Cards/BrightnessCard';
@@ -17,6 +16,7 @@ import ColorTemperatureCard from './Cards/ColorTemperatureCard';
 import ActiveModeCard from './Cards/ActiveModeCard';
 import ColorCard from './Cards/ColorCard';
 import NoConnectionDialog from './NoConnectionDialog';
+import NanoleafLayoutCard from './Cards/NanoleafLayoutCard';
 import DeviceOfflineDialog from './DeviceOfflineDialog';
 
 const useStyles = makeStyles((theme) => ({
@@ -71,11 +71,35 @@ export default function Dashboard() {
     deviceIsOffline: false,
   });
 
-  const getAndUpdateState = () => {
+  const stateRef = useRef({});
+  stateRef.current = state;
+
+  const updateLayoutSolidColor = (layout, hex) => {
+    Array.from(layout.positionData).forEach((panel) => {
+      panel.color = hex;
+    });
+
+    return layout;
+  };
+
+  const getAndUpdateState = (fromInterval) => {
     if (navigator.onLine) {
       const { nanoleafClient } = state;
       nanoleafClient.getInfo().then(deviceInfo => {
         if (deviceInfo.state) {
+          if (deviceInfo.state.colorMode === 'hs') {
+            deviceInfo.panelLayout.layout = updateLayoutSolidColor(deviceInfo.panelLayout.layout,
+              `#${convert.hsv.hex([
+                deviceInfo.state.hue.value,
+                deviceInfo.state.sat.value,
+                deviceInfo.state.brightness.value,
+              ])}`);
+          }
+
+          if (fromInterval && deviceInfo.state.colorMode === 'effect') {
+            deviceInfo.panelLayout.layout = stateRef.current.layout;
+          }
+
           setState({ ...state,
             brightness: deviceInfo.state.brightness.value,
             power: deviceInfo.state.on.value,
@@ -112,12 +136,33 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    getAndUpdateState();
+    getAndUpdateState(false);
+
     const interval = setInterval(() => {
-      getAndUpdateState();
+      getAndUpdateState(true);
     }, 5000);
     return () => clearInterval(interval);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (state.colorMode === 'effect') {
+      state.nanoleafClient.getEffectInfo(state.selectedEffect).then(response => {
+        const { layout } = state;
+        const panels = Array.from(layout.positionData);
+        const palette = Array.from(response.palette);
+
+        for (let i = 0, j = 0; i < panels.length; i++) {
+          const hex = `#${convert.hsv.hex(palette[j].hue, palette[j].saturation, palette[j].brightness)}`;
+
+          panels[i].color = hex;
+          // increment to next color in pallete or start from beginning
+          j = (j + 1) === palette.length ? 0 : j + 1;
+        }
+
+        setState({ ...state, layout });
+      });
+    }
+  }, [state.colorMode, state.selectedEffect]);
 
   const updateDeviceBrightness = (_event, brightness) => {
     state.nanoleafClient.setBrightness(brightness)
@@ -147,7 +192,9 @@ export default function Dashboard() {
   };
 
   const updateColor = color => {
-    setState({ ...state, color: color.hex.substring(1) });
+    const layout = updateLayoutSolidColor(state.layout, color.hex);
+
+    setState({ ...state, color: color.hex.substring(1), layout });
   };
 
   const selectEffect = (event) => {
@@ -199,8 +246,13 @@ export default function Dashboard() {
         <div className={classes.appBarSpacer} />
         <Container className={classes.container}>
           <Grid container spacing={2}>
-            <Grid className={classes.displayFlex} item xs={6} md={6} lg={6}>
-              <NanoleafLayout data={state.layout} svgStyle={{ width: '100%', margin: '-15px 0', transform: `rotate(${state.rotation}deg)` }} />
+            <Grid className={classes.displayFlex} item xs={6} md={6} lg={6} style={{ justifyContent: 'center' }}>
+              <NanoleafLayoutCard
+                colorMode={state.colorMode}
+                color={state.color}
+                layout={state.layout}
+                rotation={state.rotation}
+              />
             </Grid>
             <Grid item xs={6} md={6} lg={6}>
               <ColorCard
