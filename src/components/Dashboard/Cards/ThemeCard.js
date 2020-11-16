@@ -58,7 +58,7 @@ export default function ThemeCard({ selectedEffect, effectList, selectEffect, is
               {
             effectList.map(effect => (
               // <div>
-              <MenuItem key={effect} value={effect}>{effect}</MenuItem>
+              <MenuItem key={effect} value={effect} component="<h6>1123</h6>">{effect}</MenuItem>
               // <h6>123</h6>
               //  </div>
             ))
