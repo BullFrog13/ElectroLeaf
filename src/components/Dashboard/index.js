@@ -229,13 +229,6 @@ export default function Dashboard() {
       .then(() => { updatePower(!state.isPowerOn); });
   };
 
-  const switchPower = (event) => {
-    const { checked } = event.target;
-
-    state.nanoleafClient.power(checked)
-      .then(() => { updatePower(checked); });
-  };
-
   return (
     <div className={classes.displayFlex}>
       <AppBar
