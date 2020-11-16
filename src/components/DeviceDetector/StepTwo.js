@@ -50,6 +50,12 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     alignItems: 'center',
   },
+  deviceListItem: {
+    background: 'rgba(255, 255, 255,0.03)',
+    '&:hover': {
+      background: 'rgba(255, 255, 255, 0.1)',
+    },
+  },
 }));
 
 export default function StepTwo({
@@ -165,6 +171,7 @@ export default function StepTwo({
           <ListItem
             button
             onClick={useSavedDevice}
+            className={classes.deviceListItem}
           >
             <ListItemIcon>
               <DetailsIcon fontSize="large" style={{ color: state.savedDeviceActive ? green[500] : red[500] }} />
@@ -218,6 +225,7 @@ export default function StepTwo({
             {state.discoveredDevices.map((device) => (
               <ListItem
                 button
+                className={classes.deviceListItem}
                 onClick={() => selectDevice(device)}
                 key={device.deviceId}
               >
