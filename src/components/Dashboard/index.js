@@ -27,6 +27,9 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     justifyContent: 'space-between',
   },
+  powerButton: {
+    padding: '7px 15px',
+  },
   powerButtonIcon: {
     margin: 0,
   },
@@ -240,7 +243,7 @@ export default function Dashboard() {
             variant="outlined"
             color="secondary"
             classes={{ endIcon: classes.powerButtonIcon }}
-            className={state.isPowerOn ? classes.powerButtonOn : ''}
+            className={`${state.isPowerOn ? classes.powerButtonOn : ''} ${classes.powerButton}`}
             onClick={switchPowerButton}
             endIcon={<PowerSettingsNewIcon />}
           />
