@@ -20,7 +20,7 @@ export default function NanoleafLayoutCard({ colorMode, color, layout, rotation 
   };
 
   return (
-    <Box display="flex" style={{ width: '100%', height: '100%', background: colorMode === 'effect' ? getConicGradientPalette() : `#${color}`, borderRadius: '10px', justifyContent: 'center' }}>
+    <Box display="flex" style={{ width: '100%', background: colorMode === 'effect' ? getConicGradientPalette() : `#${color}`, borderRadius: '10px', justifyContent: 'center' }}>
       <Box display="flex" style={{ width: '98%', height: '98%', marginTop: '1%', backgroundColor: theme.palette.primary.main, borderRadius: '10px', justifyContent: 'center' }}>
         <NanoleafLayout data={layout} svgStyle={{ width: '75%', marginLeft: '4%', transform: `rotate(${rotation}deg)` }} />
       </Box>

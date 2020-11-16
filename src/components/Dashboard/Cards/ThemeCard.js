@@ -57,7 +57,10 @@ export default function ThemeCard({ selectedEffect, effectList, selectEffect, is
               <MenuItem value=""><em> </em></MenuItem>
               {
             effectList.map(effect => (
+              // <div>
               <MenuItem key={effect} value={effect}>{effect}</MenuItem>
+              // <h6>123</h6>
+              //  </div>
             ))
           }
             </Select>
