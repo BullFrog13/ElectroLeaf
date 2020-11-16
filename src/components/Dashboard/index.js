@@ -3,10 +3,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import {
   AppBar,
   Toolbar,
-  Typography,
   Container,
   Grid,
-  Switch } from '@material-ui/core';
+  Button } from '@material-ui/core';
+import PowerSettingsNewIcon from '@material-ui/icons/PowerSettingsNew';
 import { useHistory } from 'react-router-dom';
 import { NanoleafClient } from 'nanoleaf-client';
 import convert from 'color-convert';
@@ -23,8 +23,20 @@ const useStyles = makeStyles((theme) => ({
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
   },
-  title: {
-    flexGrow: 1,
+  spaceBetweenContent: {
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
+  powerButtonIcon: {
+    margin: 0,
+  },
+  powerButtonOn: {
+    border: 0,
+    boxShadow: 'inset 0 0 15px #fff, inset 5px 0 10px #f0f, inset -5px 0 10px #0ff, '
+    + ' inset 5px 0 20px #f0f, inset -5px 0 20px #0ff, 0 0 50px #fff, -2px 0 10px #f0f, 2px 0 10px #0ff',
+    '&:hover': {
+      border: 0,
+    },
   },
   appBarSpacer: theme.mixins.toolbar,
   content: {
@@ -53,7 +65,7 @@ export default function Dashboard() {
   if (!(token && location)) history.push('');
 
   const [state, setState] = useState({
-    power: false,
+    isPowerOn: false,
     brightness: 30,
     ctValue: 1200,
     nanoleafClient: new NanoleafClient(new URL(location).hostname, token),
@@ -102,7 +114,7 @@ export default function Dashboard() {
 
           setState({ ...state,
             brightness: deviceInfo.state.brightness.value,
-            power: deviceInfo.state.on.value,
+            isPowerOn: deviceInfo.state.on.value,
             ctValue: (deviceInfo.state.ct.value - 1200) / 53,
             layout: deviceInfo.panelLayout.layout,
             rotation: deviceInfo.panelLayout.globalOrientation.value,
@@ -170,7 +182,7 @@ export default function Dashboard() {
   };
 
   const updatePower = power => {
-    setState({ ...state, power });
+    setState({ ...state, isPowerOn: power });
   };
 
   const updateBrightnessValue = (_event, brightness) => {
@@ -212,6 +224,11 @@ export default function Dashboard() {
     setState({ ...state, deviceIsOffline: false });
   };
 
+  const switchPowerButton = () => {
+    state.nanoleafClient.power(!state.isPowerOn)
+      .then(() => { updatePower(!state.isPowerOn); });
+  };
+
   const switchPower = (event) => {
     const { checked } = event.target;
 
@@ -225,21 +242,25 @@ export default function Dashboard() {
         position="fixed"
         className={classes.appBar}
       >
-        <Toolbar>
-          <Typography variant="h6" noWrap className={classes.title}>
-            ElectroLeaf
-            <Switch checked={state.power} inputProps={{ 'aria-label': 'secondary checkbox' }} onChange={switchPower} />
-          </Typography>
+        <Toolbar className={classes.spaceBetweenContent}>
+          <Button
+            variant="outlined"
+            color="secondary"
+            classes={{ endIcon: classes.powerButtonIcon }}
+            className={state.isPowerOn ? classes.powerButtonOn : ''}
+            onClick={switchPowerButton}
+            endIcon={<PowerSettingsNewIcon />}
+          />
 
-          <Typography
-            variant="h6"
-            noWrap
+          <Button
+            variant="outlined"
+            color="secondary"
             onClick={() => {
               history.push('/', { isForceStayOnDetector: true });
             }}
           >
-            To Device Discovery
-          </Typography>
+            Device Discovery
+          </Button>
         </Toolbar>
       </AppBar>
       <main className={classes.content}>
