@@ -1,4 +1,4 @@
-import React, { } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import CardContent from '@material-ui/core/CardContent';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -8,6 +8,9 @@ import MenuItem from '@material-ui/core/MenuItem';
 import ControlCameraIcon from '@material-ui/icons/ControlCamera';
 import Chip from '@material-ui/core/Chip';
 import classNames from 'classnames';
+import { ListItemText } from '@material-ui/core';
+import Grid from '@material-ui/core/Grid';
+import convert from 'color-convert';
 import CardWrapper from '../CardWrapper';
 
 const useStyles = makeStyles((theme) => ({
@@ -29,10 +32,30 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.common.white,
     backgroundColor: 'rgba(190, 190, 190, 0.2)',
   },
+  menuPaper: {
+    maxHeight: '500px',
+  },
+  menuItem: {
+    display: 'block',
+    borderBottom: `0.5px solid ${theme.palette.primary.light}`,
+  },
+  root: {
+    flexGrow: 1,
+  },
 }));
 
 export default function ThemeCard({ selectedEffect, effectList, selectEffect, isModeEnabled }) {
   const classes = useStyles();
+
+  const getHexColor = (palette) => {
+    const hex = `#${convert.hsv.hex([
+      palette.hue,
+      palette.saturation,
+      palette.brightness,
+    ])}`;
+
+    return hex;
+  };
 
   return (
     <CardWrapper wrappedComponent={(
@@ -45,22 +68,33 @@ export default function ThemeCard({ selectedEffect, effectList, selectEffect, is
             className={classNames(classes.chip, isModeEnabled ? '' : classes.greyBg)}
           />
           <FormControl variant="outlined" className={classes.formControl}>
-            <InputLabel className={classes.dropdownLabel} htmlFor="outlined-theme-label">Theme</InputLabel>
+            <InputLabel className={classes.dropdownLabel} htmlFor="outlined-theme-label">Select Theme</InputLabel>
             <Select
               labelId="outlined-theme-label"
               id="outlined-theme"
               className={classes.dropdownSelect}
-              value={selectedEffect}
+              value={Object.keys(selectedEffect).length > 0 ? selectedEffect : ''}
               onChange={selectEffect}
               label="Theme"
+              displayEmpty
+              MenuProps={{ classes: { paper: classes.menuPaper } }}
             >
-              <MenuItem value=""><em> </em></MenuItem>
               {
             effectList.map(effect => (
-              // <div>
-              <MenuItem key={effect} value={effect} component="<h6>1123</h6>">{effect}</MenuItem>
-              // <h6>123</h6>
-              //  </div>
+              <MenuItem key={effect.animName} value={effect} className={classes.menuItem}>
+                <ListItemText>
+                  {effect.animName}
+                </ListItemText>
+                <div className={classes.root}>
+                  <Grid container>
+                    {
+                      effect.palette.map(color => (
+                        <Grid item xs style={{ backgroundColor: getHexColor(color), height: '15px' }} />
+                      ))
+                    }
+                  </Grid>
+                </div>
+              </MenuItem>
             ))
           }
             </Select>

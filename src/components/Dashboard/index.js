@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   AppBar,
@@ -76,15 +76,12 @@ export default function Dashboard() {
     },
     rotation: 0,
     color: '',
-    effectList: [],
+    effectsInfo: [],
     selectedEffect: '',
     colorMode: '',
     openConnectionDialog: false,
     deviceIsOffline: false,
   });
-
-  const stateRef = useRef({});
-  stateRef.current = state;
 
   const updateLayoutSolidColor = (layout, hex) => {
     Array.from(layout.positionData).forEach((panel) => {
@@ -94,11 +91,44 @@ export default function Dashboard() {
     return layout;
   };
 
-  const getAndUpdateState = (fromInterval) => {
+  // const handle
+
+  const getAndUpdateState = () => {
     if (navigator.onLine) {
       const { nanoleafClient } = state;
-      nanoleafClient.getInfo().then(deviceInfo => {
+
+      const getEffectsInfoResponse = nanoleafClient.getEffectsInfo();
+      const infoResponse = nanoleafClient.getInfo();
+
+      Promise.all([getEffectsInfoResponse, infoResponse]).then((response) => {
+        const effectsInfo = Array.from(response[0].animations);
+        const deviceInfo = response[1];
+
         if (deviceInfo.state) {
+          let selectedEffect = {};
+
+          const { layout } = deviceInfo.panelLayout;
+
+          if (deviceInfo.state.colorMode === 'effect') {
+            Array.from(effectsInfo).forEach(animation => {
+              if (animation.animName === deviceInfo.effects.select) {
+                selectedEffect = animation;
+              }
+            });
+
+            const panels = Array.from(layout.positionData);
+            const palette = Array.from(selectedEffect.palette);
+
+            for (let i = 0, j = 0; i < panels.length; i++) {
+              const hex = `#${convert.hsv.hex(palette[j].hue, palette[j].saturation, palette[j].brightness)}`;
+
+              panels[i].color = hex;
+              // increment to next color in pallete or start from beginning
+              j = (j + 1) === palette.length ? 0 : j + 1;
+            }
+          }
+
+          // info
           if (deviceInfo.state.colorMode === 'hs') {
             deviceInfo.panelLayout.layout = updateLayoutSolidColor(deviceInfo.panelLayout.layout,
               `#${convert.hsv.hex([
@@ -106,10 +136,6 @@ export default function Dashboard() {
                 deviceInfo.state.sat.value,
                 deviceInfo.state.brightness.value,
               ])}`);
-          }
-
-          if (fromInterval && deviceInfo.state.colorMode === 'effect') {
-            deviceInfo.panelLayout.layout = stateRef.current.layout;
           }
 
           setState({ ...state,
@@ -123,8 +149,9 @@ export default function Dashboard() {
               deviceInfo.state.sat.value,
               deviceInfo.state.brightness.value,
             ]),
-            effectList: deviceInfo.effects.effectsList,
-            selectedEffect: (deviceInfo.effects.select === '*Solid*') ? '' : deviceInfo.effects.select,
+            effectsInfo,
+            selectedEffect,
+            // selectedEffect: (deviceInfo.effects.select === '*Solid*') ? '' : deviceInfo.effects.select,
             colorMode: deviceInfo.state.colorMode,
           });
         }
@@ -139,42 +166,17 @@ export default function Dashboard() {
   };
 
   const updateColorMode = () => {
-    const { nanoleafClient } = state;
-
-    nanoleafClient.getInfo().then(deviceInfo => {
-      const { colorMode, brightness } = deviceInfo.state;
-      setState(prevState => ({ ...prevState, colorMode, brightness: brightness.value }));
-    });
+    getAndUpdateState();
   };
 
   useEffect(() => {
-    getAndUpdateState(false);
+    getAndUpdateState();
 
     const interval = setInterval(() => {
-      getAndUpdateState(true);
+      getAndUpdateState();
     }, 5000);
     return () => clearInterval(interval);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    if (state.colorMode === 'effect') {
-      state.nanoleafClient.getEffectInfo(state.selectedEffect).then(response => {
-        const { layout } = state;
-        const panels = Array.from(layout.positionData);
-        const palette = Array.from(response.palette);
-
-        for (let i = 0, j = 0; i < panels.length; i++) {
-          const hex = `#${convert.hsv.hex(palette[j].hue, palette[j].saturation, palette[j].brightness)}`;
-
-          panels[i].color = hex;
-          // increment to next color in pallete or start from beginning
-          j = (j + 1) === palette.length ? 0 : j + 1;
-        }
-
-        setState({ ...state, layout });
-      });
-    }
-  }, [state.colorMode, state.selectedEffect]);
 
   const updateDeviceBrightness = (_event, brightness) => {
     state.nanoleafClient.setBrightness(brightness)
@@ -211,8 +213,11 @@ export default function Dashboard() {
 
   const selectEffect = (event) => {
     const { value } = event.target;
-    state.nanoleafClient.setEffect(value)
-      .then(() => { updateColorMode({ selectedEffect: value }); });
+
+    state.nanoleafClient.setEffect(value.animName)
+      .then(() => {
+        updateColorMode({ selectedEffect: value });
+      });
     setState({ ...state, selectedEffect: value });
   };
 
@@ -227,13 +232,6 @@ export default function Dashboard() {
   const switchPowerButton = () => {
     state.nanoleafClient.power(!state.isPowerOn)
       .then(() => { updatePower(!state.isPowerOn); });
-  };
-
-  const switchPower = (event) => {
-    const { checked } = event.target;
-
-    state.nanoleafClient.power(checked)
-      .then(() => { updatePower(checked); });
   };
 
   return (
@@ -303,7 +301,7 @@ export default function Dashboard() {
             <Grid item xs={12} sm={6} md={3} lg={3}>
               <ThemeCard
                 selectedEffect={state.selectedEffect}
-                effectList={state.effectList}
+                effectList={state.effectsInfo}
                 selectEffect={selectEffect}
                 isModeEnabled={state.colorMode === 'effect'}
               />
