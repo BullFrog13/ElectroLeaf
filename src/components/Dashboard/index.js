@@ -91,16 +91,14 @@ export default function Dashboard() {
     return layout;
   };
 
-  // const handle
-
   const getAndUpdateState = () => {
     if (navigator.onLine) {
       const { nanoleafClient } = state;
 
-      const getEffectsInfoResponse = nanoleafClient.getEffectsInfo();
-      const infoResponse = nanoleafClient.getInfo();
+      const getEffectsInfoPromise = nanoleafClient.getEffectsInfo();
+      const getInfoPromise = nanoleafClient.getInfo();
 
-      Promise.all([getEffectsInfoResponse, infoResponse]).then((response) => {
+      Promise.all([getEffectsInfoPromise, getInfoPromise]).then((response) => {
         const effectsInfo = Array.from(response[0].animations);
         const deviceInfo = response[1];
 
@@ -110,11 +108,7 @@ export default function Dashboard() {
           const { layout } = deviceInfo.panelLayout;
 
           if (deviceInfo.state.colorMode === 'effect') {
-            Array.from(effectsInfo).forEach(animation => {
-              if (animation.animName === deviceInfo.effects.select) {
-                selectedEffect = animation;
-              }
-            });
+            selectedEffect = effectsInfo.find(animation => animation.animName === deviceInfo.effects.select);
 
             const panels = Array.from(layout.positionData);
             const palette = Array.from(selectedEffect.palette);
@@ -151,7 +145,6 @@ export default function Dashboard() {
             ]),
             effectsInfo,
             selectedEffect,
-            // selectedEffect: (deviceInfo.effects.select === '*Solid*') ? '' : deviceInfo.effects.select,
             colorMode: deviceInfo.state.colorMode,
           });
         }
