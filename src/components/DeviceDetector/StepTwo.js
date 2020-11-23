@@ -149,6 +149,7 @@ export default function StepTwo({
             Saved Device
           </Typography>
           <HtmlTooltip
+            placement="right-end"
             title={(
               <>
                 <div className={classes.savedDeviceHintText}>
