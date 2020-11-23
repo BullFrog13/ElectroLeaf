@@ -84,7 +84,7 @@ export default function Dashboard() {
   });
 
   const updateLayoutSolidColor = (layout, hex) => {
-    Array.from(layout.positionData).forEach((panel) => {
+    layout.positionData.forEach((panel) => {
       panel.color = hex;
     });
 
@@ -92,15 +92,12 @@ export default function Dashboard() {
   };
 
   const updatePanelsColorData = (layout, selectedEffect) => {
-    const panels = Array.from(layout.positionData);
-    const palette = Array.from(selectedEffect.palette);
+    for (let i = 0, j = 0; i < layout.positionData.length; i++) {
+      const hex = `#${convert.hsv.hex(selectedEffect.palette[j].hue, selectedEffect.palette[j].saturation, selectedEffect.palette[j].brightness)}`;
 
-    for (let i = 0, j = 0; i < panels.length; i++) {
-      const hex = `#${convert.hsv.hex(palette[j].hue, palette[j].saturation, palette[j].brightness)}`;
-
-      panels[i].color = hex;
+      layout.positionData[i].color = hex;
       // increment to next color in pallete or start from beginning
-      j = (j + 1) === palette.length ? 0 : j + 1;
+      j = (j + 1) === selectedEffect.palette.length ? 0 : j + 1;
     }
   };
 
@@ -112,7 +109,7 @@ export default function Dashboard() {
       const getInfoPromise = nanoleafClient.getInfo();
 
       Promise.all([getEffectsInfoPromise, getInfoPromise]).then((response) => {
-        const effectsInfo = Array.from(response[0].animations);
+        const effectsInfo = response[0].animations;
         const deviceInfo = response[1];
 
         if (deviceInfo.state) {
@@ -139,7 +136,6 @@ export default function Dashboard() {
           setState({ ...state,
             brightness: deviceInfo.state.brightness.value,
             isPowerOn: deviceInfo.state.on.value,
-            // ctValue: (deviceInfo.state.ct.value - 1200) / 53,
             ctValue: deviceInfo.state.ct.value,
             layout: deviceInfo.panelLayout.layout,
             rotation: deviceInfo.panelLayout.globalOrientation.value,
@@ -173,8 +169,7 @@ export default function Dashboard() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const updateDeviceBrightness = (_event, brightness) => {
-    state.nanoleafClient.setBrightness(brightness)
-      .then(() => { setState(prevState => ({ ...prevState, brightness })); });
+    state.nanoleafClient.setBrightness(brightness);
   };
 
   const updatePower = power => {
