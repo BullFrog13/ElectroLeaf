@@ -91,6 +91,19 @@ export default function Dashboard() {
     return layout;
   };
 
+  const updatePanelsColorData = (layout, selectedEffect) => {
+    const panels = Array.from(layout.positionData);
+    const palette = Array.from(selectedEffect.palette);
+
+    for (let i = 0, j = 0; i < panels.length; i++) {
+      const hex = `#${convert.hsv.hex(palette[j].hue, palette[j].saturation, palette[j].brightness)}`;
+
+      panels[i].color = hex;
+      // increment to next color in pallete or start from beginning
+      j = (j + 1) === palette.length ? 0 : j + 1;
+    }
+  };
+
   const getAndUpdateState = () => {
     if (navigator.onLine) {
       const { nanoleafClient } = state;
@@ -110,16 +123,7 @@ export default function Dashboard() {
           if (deviceInfo.state.colorMode === 'effect') {
             selectedEffect = effectsInfo.find(animation => animation.animName === deviceInfo.effects.select);
 
-            const panels = Array.from(layout.positionData);
-            const palette = Array.from(selectedEffect.palette);
-
-            for (let i = 0, j = 0; i < panels.length; i++) {
-              const hex = `#${convert.hsv.hex(palette[j].hue, palette[j].saturation, palette[j].brightness)}`;
-
-              panels[i].color = hex;
-              // increment to next color in pallete or start from beginning
-              j = (j + 1) === palette.length ? 0 : j + 1;
-            }
+            updatePanelsColorData(layout, selectedEffect);
           }
 
           // info
@@ -135,7 +139,8 @@ export default function Dashboard() {
           setState({ ...state,
             brightness: deviceInfo.state.brightness.value,
             isPowerOn: deviceInfo.state.on.value,
-            ctValue: (deviceInfo.state.ct.value - 1200) / 53,
+            // ctValue: (deviceInfo.state.ct.value - 1200) / 53,
+            ctValue: deviceInfo.state.ct.value,
             layout: deviceInfo.panelLayout.layout,
             rotation: deviceInfo.panelLayout.globalOrientation.value,
             color: convert.hsv.hex([
@@ -158,10 +163,6 @@ export default function Dashboard() {
     }
   };
 
-  const updateColorMode = () => {
-    getAndUpdateState();
-  };
-
   useEffect(() => {
     getAndUpdateState();
 
@@ -173,7 +174,7 @@ export default function Dashboard() {
 
   const updateDeviceBrightness = (_event, brightness) => {
     state.nanoleafClient.setBrightness(brightness)
-      .then(() => { updateColorMode(); });
+      .then(() => { setState(prevState => ({ ...prevState, brightness })); });
   };
 
   const updatePower = power => {
@@ -185,8 +186,8 @@ export default function Dashboard() {
   };
 
   const updateDeviceCt = (_event, ctValue) => {
-    state.nanoleafClient.setColorTemperature((ctValue * 53) + 1200)
-      .then(() => { updateColorMode(); });
+    state.nanoleafClient.setColorTemperature(ctValue)
+      .then(() => { setState(prevState => ({ ...prevState, ctValue, colorMode: 'ct' })); });
   };
 
   const updateCtValue = (_event, ctValue) => {
@@ -195,13 +196,13 @@ export default function Dashboard() {
 
   const updateDeviceColor = color => {
     state.nanoleafClient.setHexColor(color.hex)
-      .then(() => { updateColorMode(); });
+      .then(() => { setState(prevState => ({ ...prevState, color: color.hex })); });
   };
 
   const updateColor = color => {
     const layout = updateLayoutSolidColor(state.layout, color.hex);
 
-    setState({ ...state, color: color.hex.substring(1), layout });
+    setState({ ...state, color: color.hex.substring(1), layout, colorMode: 'hs' });
   };
 
   const selectEffect = (event) => {
@@ -209,9 +210,9 @@ export default function Dashboard() {
 
     state.nanoleafClient.setEffect(value.animName)
       .then(() => {
-        updateColorMode({ selectedEffect: value });
+        updatePanelsColorData(state.layout, value);
+        setState({ ...state, selectedEffect: value, colorMode: 'effect', layout: state.layout });
       });
-    setState({ ...state, selectedEffect: value });
   };
 
   const closeConnectionDialog = () => {
