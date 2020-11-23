@@ -41,15 +41,11 @@ export default function ColorTemperatureCard({
             className={classes.slider}
             aria-labelledby="continuous-slider"
             valueLabelDisplay="on"
-            min={0}
-            max={100}
+            min={1200}
+            max={6500}
             marks={[
-              { value: 0, label: '0' },
-              { value: 20, label: '20' },
-              { value: 40, label: '40' },
-              { value: 60, label: '60' },
-              { value: 80, label: '80' },
-              { value: 100, label: '100' },
+              { value: 1200, label: '1.2k' },
+              { value: 6500, label: '6.5k' },
             ]}
             color="secondary"
           />

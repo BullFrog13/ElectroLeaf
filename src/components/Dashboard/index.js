@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   AppBar,
@@ -79,29 +79,54 @@ export default function Dashboard() {
     },
     rotation: 0,
     color: '',
-    effectList: [],
+    effectsInfo: [],
     selectedEffect: '',
     colorMode: '',
     openConnectionDialog: false,
     deviceIsOffline: false,
   });
 
-  const stateRef = useRef({});
-  stateRef.current = state;
-
   const updateLayoutSolidColor = (layout, hex) => {
-    Array.from(layout.positionData).forEach((panel) => {
+    layout.positionData.forEach((panel) => {
       panel.color = hex;
     });
 
     return layout;
   };
 
-  const getAndUpdateState = (fromInterval) => {
+  const updatePanelsColorData = (layout, selectedEffect) => {
+    for (let i = 0, j = 0; i < layout.positionData.length; i++) {
+      const hex = `#${convert.hsv.hex(selectedEffect.palette[j].hue, selectedEffect.palette[j].saturation, selectedEffect.palette[j].brightness)}`;
+
+      layout.positionData[i].color = hex;
+      // increment to next color in pallete or start from beginning
+      j = (j + 1) === selectedEffect.palette.length ? 0 : j + 1;
+    }
+  };
+
+  const getAndUpdateState = () => {
     if (navigator.onLine) {
       const { nanoleafClient } = state;
-      nanoleafClient.getInfo().then(deviceInfo => {
+
+      const getEffectsInfoPromise = nanoleafClient.getEffectsInfo();
+      const getInfoPromise = nanoleafClient.getInfo();
+
+      Promise.all([getEffectsInfoPromise, getInfoPromise]).then((response) => {
+        const effectsInfo = response[0].animations;
+        const deviceInfo = response[1];
+
         if (deviceInfo.state) {
+          let selectedEffect = {};
+
+          const { layout } = deviceInfo.panelLayout;
+
+          if (deviceInfo.state.colorMode === 'effect') {
+            selectedEffect = effectsInfo.find(animation => animation.animName === deviceInfo.effects.select);
+
+            updatePanelsColorData(layout, selectedEffect);
+          }
+
+          // info
           if (deviceInfo.state.colorMode === 'hs') {
             deviceInfo.panelLayout.layout = updateLayoutSolidColor(deviceInfo.panelLayout.layout,
               `#${convert.hsv.hex([
@@ -111,14 +136,10 @@ export default function Dashboard() {
               ])}`);
           }
 
-          if (fromInterval && deviceInfo.state.colorMode === 'effect') {
-            deviceInfo.panelLayout.layout = stateRef.current.layout;
-          }
-
           setState({ ...state,
             brightness: deviceInfo.state.brightness.value,
             isPowerOn: deviceInfo.state.on.value,
-            ctValue: (deviceInfo.state.ct.value - 1200) / 53,
+            ctValue: deviceInfo.state.ct.value,
             layout: deviceInfo.panelLayout.layout,
             rotation: deviceInfo.panelLayout.globalOrientation.value,
             color: convert.hsv.hex([
@@ -126,8 +147,8 @@ export default function Dashboard() {
               deviceInfo.state.sat.value,
               deviceInfo.state.brightness.value,
             ]),
-            effectList: deviceInfo.effects.effectsList,
-            selectedEffect: (deviceInfo.effects.select === '*Solid*') ? '' : deviceInfo.effects.select,
+            effectsInfo,
+            selectedEffect,
             colorMode: deviceInfo.state.colorMode,
           });
         }
@@ -141,47 +162,17 @@ export default function Dashboard() {
     }
   };
 
-  const updateColorMode = () => {
-    const { nanoleafClient } = state;
-
-    nanoleafClient.getInfo().then(deviceInfo => {
-      const { colorMode, brightness } = deviceInfo.state;
-      setState(prevState => ({ ...prevState, colorMode, brightness: brightness.value }));
-    });
-  };
-
   useEffect(() => {
-    getAndUpdateState(false);
+    getAndUpdateState();
 
     const interval = setInterval(() => {
-      getAndUpdateState(true);
+      getAndUpdateState();
     }, 5000);
     return () => clearInterval(interval);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    if (state.colorMode === 'effect') {
-      state.nanoleafClient.getEffectInfo(state.selectedEffect).then(response => {
-        const { layout } = state;
-        const panels = Array.from(layout.positionData);
-        const palette = Array.from(response.palette);
-
-        for (let i = 0, j = 0; i < panels.length; i++) {
-          const hex = `#${convert.hsv.hex(palette[j].hue, palette[j].saturation, palette[j].brightness)}`;
-
-          panels[i].color = hex;
-          // increment to next color in pallete or start from beginning
-          j = (j + 1) === palette.length ? 0 : j + 1;
-        }
-
-        setState({ ...state, layout });
-      });
-    }
-  }, [state.colorMode, state.selectedEffect]);
-
   const updateDeviceBrightness = (_event, brightness) => {
-    state.nanoleafClient.setBrightness(brightness)
-      .then(() => { updateColorMode(); });
+    state.nanoleafClient.setBrightness(brightness);
   };
 
   const updatePower = power => {
@@ -193,8 +184,8 @@ export default function Dashboard() {
   };
 
   const updateDeviceCt = (_event, ctValue) => {
-    state.nanoleafClient.setColorTemperature((ctValue * 53) + 1200)
-      .then(() => { updateColorMode(); });
+    state.nanoleafClient.setColorTemperature(ctValue)
+      .then(() => { setState(prevState => ({ ...prevState, colorMode: 'ct' })); });
   };
 
   const updateCtValue = (_event, ctValue) => {
@@ -202,21 +193,25 @@ export default function Dashboard() {
   };
 
   const updateDeviceColor = color => {
-    state.nanoleafClient.setHexColor(color.hex)
-      .then(() => { updateColorMode(); });
+    state.nanoleafClient.setHexColor(color.hex).then(() => {
+      setState(prevState => ({ ...prevState, brightness: Math.round(color.hsv.v * 100) }));
+    });
   };
 
   const updateColor = color => {
     const layout = updateLayoutSolidColor(state.layout, color.hex);
 
-    setState({ ...state, color: color.hex.substring(1), layout });
+    setState({ ...state, color: color.hex.substring(1), layout, colorMode: 'hs' });
   };
 
   const selectEffect = (event) => {
     const { value } = event.target;
-    state.nanoleafClient.setEffect(value)
-      .then(() => { updateColorMode({ selectedEffect: value }); });
-    setState({ ...state, selectedEffect: value });
+
+    state.nanoleafClient.setEffect(value.animName)
+      .then(() => {
+        updatePanelsColorData(state.layout, value);
+        setState({ ...state, selectedEffect: value, colorMode: 'effect', layout: state.layout });
+      });
   };
 
   const closeConnectionDialog = () => {
@@ -299,7 +294,7 @@ export default function Dashboard() {
             <Grid item xs={12} sm={6} md={3} lg={3}>
               <ThemeCard
                 selectedEffect={state.selectedEffect}
-                effectList={state.effectList}
+                effectList={state.effectsInfo}
                 selectEffect={selectEffect}
                 isModeEnabled={state.colorMode === 'effect'}
               />
