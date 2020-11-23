@@ -22,10 +22,17 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const colorPickerStyles = {
+  display: 'flex',
+  flexDirection: 'column',
   background: 'none',
   boxShadow: 'none',
   margin: '0 -16px',
   width: 'auto',
+  flex: '1 1 auto',
+};
+
+const saturationStyles = {
+  flex: '1 1 auto',
 };
 
 export default function ColorCard({
@@ -49,7 +56,7 @@ export default function ColorCard({
           onChange={updateColor}
           onChangeComplete={updateDeviceColor}
           color={color}
-          styles={{ default: { picker: colorPickerStyles } }}
+          styles={{ default: { picker: colorPickerStyles, saturation: saturationStyles } }}
         />
       </CardContent>
     )}
