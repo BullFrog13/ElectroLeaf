@@ -182,7 +182,7 @@ export default function Dashboard() {
 
   const updateDeviceCt = (_event, ctValue) => {
     state.nanoleafClient.setColorTemperature(ctValue)
-      .then(() => { setState(prevState => ({ ...prevState, ctValue, colorMode: 'ct' })); });
+      .then(() => { setState(prevState => ({ ...prevState, colorMode: 'ct' })); });
   };
 
   const updateCtValue = (_event, ctValue) => {
@@ -190,8 +190,9 @@ export default function Dashboard() {
   };
 
   const updateDeviceColor = color => {
-    state.nanoleafClient.setHexColor(color.hex)
-      .then(() => { setState(prevState => ({ ...prevState, color: color.hex })); });
+    state.nanoleafClient.setHexColor(color.hex).then(() => {
+      setState(prevState => ({ ...prevState, brightness: Math.round(color.hsv.v * 100) }));
+    });
   };
 
   const updateColor = color => {
