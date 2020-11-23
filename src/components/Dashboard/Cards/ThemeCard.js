@@ -88,8 +88,8 @@ export default function ThemeCard({ selectedEffect, effectList, selectEffect, is
                 <div className={classes.root}>
                   <Grid container>
                     {
-                      effect.palette.map(color => (
-                        <Grid item xs style={{ backgroundColor: getHexColor(color), height: '15px' }} />
+                      effect.palette.map((color, index) => (
+                        <Grid key={`${String(effect.animName)}${index}`} item xs style={{ backgroundColor: getHexColor(color), height: '15px' }} />
                       ))
                     }
                   </Grid>
