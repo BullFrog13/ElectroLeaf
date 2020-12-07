@@ -12,6 +12,7 @@ export default () => (
       <CssBaseline />
       <Switch>
         <Route
+          exact
           path="/"
           component={DeviceDetector}
         />
