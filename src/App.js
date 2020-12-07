@@ -6,28 +6,21 @@ import Dashboard from './components/Dashboard';
 import DeviceDetector from './components/DeviceDetector';
 import theme from './theme';
 
-export default () => {
-  const componentThemeWrapper = Component => (
+export default () => (
+  <Router>
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Component />
-    </ThemeProvider>
-  );
-
-  return (
-    <Router>
       <Switch>
         <Route
-          exact
           path="/"
-          component={() => componentThemeWrapper(DeviceDetector)}
+          component={DeviceDetector}
         />
         <Route
           path="/dashboard"
-          component={() => componentThemeWrapper(Dashboard)}
+          component={Dashboard}
         />
-        <Route render={() => <h1>Page not found</h1>} />
+        <Route path="*" render={() => <h1>Page not found</h1>} />
       </Switch>
-    </Router>
-  );
-};
+    </ThemeProvider>
+  </Router>
+);
