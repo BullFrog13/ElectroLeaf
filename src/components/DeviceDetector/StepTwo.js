@@ -16,6 +16,7 @@ import { green, red, grey } from '@material-ui/core/colors';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import axios from 'axios';
 import Tooltip from '@material-ui/core/Tooltip';
+import RefreshIcon from '@material-ui/icons/Refresh';
 import CardDivider from '../Dashboard/CardDivider';
 import {
   UNPROCCESSABLE_ENTITY_HTTP_CODE,
@@ -74,25 +75,29 @@ export default function StepTwo({
     savedDeviceActive: false,
   });
 
+  const checkDeviceConnection = () => {
+    axios.get(savedDevice.location, { timeout: DEFAULT_REQUEST_TIMEOUT })
+      .then(() => { }, error => {
+        let deviceActive = false;
+
+        if (error.response && error.response.status === UNPROCCESSABLE_ENTITY_HTTP_CODE) {
+          deviceActive = true;
+        }
+
+        if (error.code === CONNECTION_ABORTED_HTTP_RESPONSE_CODE) {
+          deviceActive = false;
+        }
+
+        setState({
+          ...state,
+          savedDeviceActive: deviceActive,
+        });
+      });
+  };
+
   useEffect(() => {
     if (savedDevice) {
-      axios.get(savedDevice.location, { timeout: DEFAULT_REQUEST_TIMEOUT })
-        .then(() => { }, error => {
-          let deviceActive = false;
-
-          if (error.response && error.response.status === UNPROCCESSABLE_ENTITY_HTTP_CODE) {
-            deviceActive = true;
-          }
-
-          if (error.code === CONNECTION_ABORTED_HTTP_RESPONSE_CODE) {
-            deviceActive = false;
-          }
-
-          setState({
-            ...state,
-            savedDeviceActive: deviceActive,
-          });
-        });
+      checkDeviceConnection();
     }
   }, []);
 
@@ -186,6 +191,15 @@ export default function StepTwo({
               isSavedDeviceConnecting
             && <CircularProgress color="secondary" />
             }
+            <IconButton
+              aria-label="Refresh device state"
+              onClick={(e) => {
+                e.stopPropagation();
+                checkDeviceConnection();
+              }}
+            >
+              <RefreshIcon fontSize="large" style={{ color: grey[100] }} />
+            </IconButton>
             <IconButton
               aria-label="Remove saved device"
               onClick={(e) => {
