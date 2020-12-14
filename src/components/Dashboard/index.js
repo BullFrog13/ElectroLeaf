@@ -250,7 +250,10 @@ export default function Dashboard() {
             variant="outlined"
             color="secondary"
             onClick={() => {
-              history.push('/', { isForceStayOnDetector: true });
+              history.push({
+                pathname: '/',
+                search: `?isForceStayOnDetector=${true}`,
+              });
             }}
           >
             Device Discovery
