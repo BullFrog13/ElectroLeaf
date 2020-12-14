@@ -37,7 +37,6 @@ const ColorlibConnector = withStyles(theme => ({
   },
 }))(StepConnector);
 
-
 export default function CustomStepper({ activeStep }) {
   const classes = useStyles();
   const steps = ['Discover devices', 'Select device', 'Authorize device'];
