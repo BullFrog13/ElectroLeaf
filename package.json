@@ -34,7 +34,10 @@
     },
     "mac": {
       "category": "your.app.category.type"
-    }
+    },
+    "extraFiles": [
+      "src/discovery"
+    ]
   },
   "browserslist": {
     "production": [
