@@ -3,6 +3,8 @@ const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const isDev = require('electron-is-dev');
 
+const server = require(path.resolve(__dirname, isDev ? '../src/discovery/server' : '../../../src/discovery/server.js'));
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
@@ -23,7 +25,7 @@ function createWindow() {
   mainWindow.loadURL(
     isDev
       ? 'http://localhost:3000'
-      : `file://${path.join(__dirname, '../build/index.html')}`,
+      : `file://${__dirname}/../build/index.html`,
   );
 
   // Open the DevTools.

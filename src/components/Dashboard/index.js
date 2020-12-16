@@ -88,6 +88,7 @@ export default function Dashboard() {
 
   const updateLayoutSolidColor = (layout, hex) => {
     layout.positionData.forEach((panel) => {
+      // eslint-disable-next-line no-param-reassign
       panel.color = hex;
     });
 
@@ -98,6 +99,7 @@ export default function Dashboard() {
     for (let i = 0, j = 0; i < layout.positionData.length; i++) {
       const hex = `#${convert.hsv.hex(selectedEffect.palette[j].hue, selectedEffect.palette[j].saturation, selectedEffect.palette[j].brightness)}`;
 
+      // eslint-disable-next-line no-param-reassign
       layout.positionData[i].color = hex;
       // increment to next color in pallete or start from beginning
       j = (j + 1) === selectedEffect.palette.length ? 0 : j + 1;
@@ -121,6 +123,7 @@ export default function Dashboard() {
           const { layout } = deviceInfo.panelLayout;
 
           if (deviceInfo.state.colorMode === 'effect') {
+            // eslint-disable-next-line max-len
             selectedEffect = effectsInfo.find(animation => animation.animName === deviceInfo.effects.select);
 
             updatePanelsColorData(layout, selectedEffect);
@@ -169,7 +172,7 @@ export default function Dashboard() {
       getAndUpdateState();
     }, 5000);
     return () => clearInterval(interval);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   const updateDeviceBrightness = (_event, brightness) => {
     state.nanoleafClient.setBrightness(brightness);
@@ -247,7 +250,10 @@ export default function Dashboard() {
             variant="outlined"
             color="secondary"
             onClick={() => {
-              history.push('/', { isForceStayOnDetector: true });
+              history.push({
+                pathname: '/',
+                search: `?isForceStayOnDetector=${true}`,
+              });
             }}
           >
             Device Discovery

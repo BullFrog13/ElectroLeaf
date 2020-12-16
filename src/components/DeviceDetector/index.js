@@ -59,13 +59,17 @@ export default function DeviceDetector() {
     activeStep: 0,
     savedDeviceConfig: null,
     authorizationFailed: false,
-    isForceStayOnThisScreen: (history.location.state)
-      ? history.location.state.isForceStayOnDetector : false,
     showSavedDeviceError: false,
     showNoDevicesFoundError: false,
     isSavedDeviceConnecting: false,
   });
 
+  let isForceStayOnThisScreen = false;
+  if (history.location.search) {
+    const query = new URLSearchParams(history.location.search);
+    const isForceStayOnDetector = query.get('isForceStayOnDetector');
+    isForceStayOnThisScreen = isForceStayOnDetector;
+  }
   const goToDashboard = (location, token, uuid) => {
     history.push({
       pathname: '/dashboard',
@@ -96,7 +100,7 @@ export default function DeviceDetector() {
 
   const tryUseSavedConfig = () => {
     getConfig().then((config) => {
-      if (!state.isForceStayOnThisScreen && config) {
+      if (!isForceStayOnThisScreen && config) {
         tryUseSavedDevice(config, true);
       } else if (config) {
         setState({ ...state, savedDeviceConfig: config });
@@ -106,7 +110,7 @@ export default function DeviceDetector() {
 
   useEffect(() => {
     tryUseSavedConfig();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   const goToDiscoveryStep = () => {
     setState({
