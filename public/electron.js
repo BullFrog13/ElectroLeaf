@@ -19,6 +19,7 @@ function createWindow() {
     webPreferences: {
       webSecurity: !isDev,
     },
+    icon: `${__dirname}/icon.ico`,
   });
 
   // and load the index.html of the app.

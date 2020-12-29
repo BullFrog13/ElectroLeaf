@@ -1,5 +1,5 @@
 {
-  "name": "electro-leaf1",
+  "name": "electroleaf",
   "version": "0.1.0",
   "private": true,
   "main": "public/electron.js",
@@ -22,16 +22,16 @@
     "extends": "react-app"
   },
   "build": {
-    "appId": "electro.leaf",
+    "appId": "electroleaf.app",
     "extends": null,
     "productName": "ElectroLeaf",
-    "files": [
-      "build/**/*",
-      "node_modules/**/*"
-    ],
     "directories": {
-      "buildResources": "assets"
+      "buildResources": "public"
     },
+    "files": [
+      "./build/**/*",
+      "./public/**/*"
+    ],
     "mac": {
       "category": "your.app.category.type"
     },
